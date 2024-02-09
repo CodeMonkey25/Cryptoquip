@@ -29,6 +29,9 @@
                 <MenuItem Header="Copy" IsEnabled="False" />
                 <MenuItem Header="Paste" IsEnabled="False" />
             </MenuItem>
+            <MenuItem Header="_Solver">
+                <MenuItem Header="Run Solver..." Command="{Binding $parent[views:MainWindow].RunSolverCommand}" />
+            </MenuItem>
         </Menu>
         <ScrollViewer Grid.Row="1" Grid.Column="0">
             <ItemsControl ItemsSource="{Binding Words}">

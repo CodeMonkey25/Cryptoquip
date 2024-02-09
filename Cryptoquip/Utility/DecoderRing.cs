@@ -7,6 +7,7 @@ public class DecoderRing
 {
     private Dictionary<char, char> _map = new Dictionary<char, char>();
     private ISet<char> _hints = new HashSet<char>();
+    public int SolveCount => _map.Count;
 
     public void Put(char letter, char match)
     {
@@ -97,5 +98,12 @@ public class DecoderRing
     public bool WasSetFromHint(char letter)
     {
         return _hints.Contains(letter);
+    }
+
+    public DecoderRing Clone()
+    {
+        DecoderRing that = new DecoderRing();
+        that._map = this._map.ToDictionary(entry => entry.Key, entry => entry.Value);
+        return that;
     }
 }

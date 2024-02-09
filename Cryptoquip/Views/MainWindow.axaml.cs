@@ -27,11 +27,20 @@ public partial class MainWindow : Window
         set => SetAndRaise(ExitCommandProperty, ref _exitCommand, value);
     }
     
+    public static readonly DirectProperty<MainWindow, ICommand> RunSolverProperty = AvaloniaProperty.RegisterDirect<MainWindow, ICommand>(nameof(RunSolverCommand), o => o.RunSolverCommand, (o, v) => o.RunSolverCommand = v);
+    private ICommand _runSolverCommand = NullCommand.Instance;
+    public ICommand RunSolverCommand
+    {
+        get => _runSolverCommand;
+        set => SetAndRaise(RunSolverProperty, ref _runSolverCommand, value);
+    }
+    
     public MainWindow()
     {
         InitializeComponent();
         LoadPuzzleCommand = ReactiveCommand.Create(LoadPuzzle);
         ExitCommand = ReactiveCommand.Create(Exit);
+        RunSolverCommand = ReactiveCommand.Create(RunSolver);
     }
 
     public async Task LoadPuzzle()
@@ -48,5 +57,17 @@ public partial class MainWindow : Window
     private void Exit()
     {
         Close();
+    }
+
+    private async Task RunSolver()
+    {
+        if (!(DataContext is MainWindowViewModel mainWindowViewModel)) return;
+
+        SolverWindowViewModel solverWindowViewModel = new SolverWindowViewModel(mainWindowViewModel.OriginalMessage);
+        SolverWindow dialog = new SolverWindow() { DataContext = solverWindowViewModel};
+        string? result = await dialog.ShowDialog<string?>(this);
+        if (string.IsNullOrWhiteSpace(result)) return;
+        
+        // vm.LoadPuzzle(result);
     }
 }

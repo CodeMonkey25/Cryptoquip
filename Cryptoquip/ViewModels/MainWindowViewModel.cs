@@ -21,6 +21,8 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _words, value);
     }
 
+    public string OriginalMessage { get; set; }
+    
     public MainWindowViewModel() { }
     
     public void LoadPuzzle(string puzzle)
@@ -29,6 +31,7 @@ public class MainWindowViewModel : ViewModelBase
         ring.Clear();
         
         string[] input = puzzle.ToUpper().Split("<HINT>:");
+        OriginalMessage = input.First();
         if (input.Length >= 2)
         {
             ring.LoadHints(input[1]);
