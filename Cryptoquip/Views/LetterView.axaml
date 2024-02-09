@@ -1,0 +1,44 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Cryptoquip.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cryptoquip.Views.LetterView"
+             x:DataType="viewModels:LetterViewModel"
+             Width="20" 
+             Height="75"
+             Background="Black"
+             Margin="2"
+             PointerEntered="InputElement_OnPointerEntered"
+             PointerExited="InputElement_OnPointerExited"
+             PointerPressed="InputElement_OnPointerPressed">
+    <Design.DataContext>
+        <viewModels:LetterViewModel/>
+    </Design.DataContext>
+    
+    <UserControl.Styles>
+        <Style Selector="Grid.IsMouseOver">
+            <Style.Setters>
+                <Setter Property="Background" Value="Yellow" />
+            </Style.Setters>
+        </Style>
+        <Style Selector="TextBlock.WasSetFromHint">
+            <Style.Setters>
+                <Setter Property="Foreground" Value="DodgerBlue" />
+            </Style.Setters>
+        </Style>
+        <Style Selector="TextBlock.WasSetByPlayer">
+            <Style.Setters>
+                <Setter Property="Foreground" Value="Green" />
+            </Style.Setters>
+        </Style>
+    </UserControl.Styles>
+    
+    <Grid Classes.IsMouseOver="{Binding IsMouseOver}" RowDefinitions="*,auto,*">
+        <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding DecodedLetter}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" 
+                   Classes.WasSetFromHint="{Binding WasSetFromHint}" Classes.WasSetByPlayer="{Binding !WasSetFromHint}" />
+        <Panel Grid.Column="0" Grid.Row="1" Width="20" Height="2" Background="DarkGray" />
+        <TextBlock Grid.Column="0" Grid.Row="2" Text="{Binding Letter}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="DarkGray"/>
+    </Grid>
+</UserControl>

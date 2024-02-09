@@ -1,0 +1,39 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Cryptoquip.ViewModels"
+             xmlns:views="clr-namespace:Cryptoquip.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Cryptoquip.Views.WordView"
+             x:DataType="viewModels:WordViewModel"
+             Background="DarkGray"
+             Margin="5 10"
+             Padding="1"
+             PointerEntered="InputElement_OnPointerEntered"
+             PointerExited="InputElement_OnPointerExited">
+    
+    <Design.DataContext>
+        <viewModels:WordViewModel/>
+    </Design.DataContext>
+    
+    <Grid>
+        <ItemsControl Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Letters}">
+            <!-- <ItemsControl.Styles> -->
+            <!--     <Style Selector="views|LetterView"> -->
+            <!--         <Setter Property="Margin" Value="3" /> -->
+            <!--         <Setter Property="Background" Value="White" /> -->
+            <!--     </Style> -->
+            <!-- </ItemsControl.Styles> -->
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        
+        <Canvas PointerPressed="InputElement_OnPointerPressed" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsVisible="{Binding IsMouseOver}">
+            <Polygon Points="5,5 15,5, 10,13" Stroke="Black" Fill="White" StrokeThickness="1" />
+        </Canvas>
+    </Grid>
+</UserControl>
