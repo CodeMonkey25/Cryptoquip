@@ -19,12 +19,6 @@
     
     <Grid>
         <ItemsControl Grid.Column="0" Grid.Row="0" ItemsSource="{Binding Letters}">
-            <!-- <ItemsControl.Styles> -->
-            <!--     <Style Selector="views|LetterView"> -->
-            <!--         <Setter Property="Margin" Value="3" /> -->
-            <!--         <Setter Property="Background" Value="White" /> -->
-            <!--     </Style> -->
-            <!-- </ItemsControl.Styles> -->
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal" />
@@ -33,7 +27,18 @@
         </ItemsControl>
         
         <Canvas PointerPressed="InputElement_OnPointerPressed" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsVisible="{Binding IsMouseOver}">
-            <Polygon Points="5,5 15,5, 10,13" Stroke="Black" Fill="White" StrokeThickness="1" />
+            <Canvas.Styles>
+                <Style Selector="Polygon">
+                    <Setter Property="Stroke" Value="Black" />
+                    <Setter Property="Fill" Value="White" />
+                </Style>
+                <Style Selector="Polygon:pointerover">
+                    <Setter Property="Stroke" Value="White" />
+                    <Setter Property="Fill" Value="Black" />
+                </Style>
+            </Canvas.Styles>
+            <Rectangle Canvas.Left="0" Canvas.Top="0" Width="20" Height="20" Fill="Transparent" />
+            <Polygon Points="5,10 15,10,10,18" StrokeThickness="1" />
         </Canvas>
     </Grid>
 </UserControl>
