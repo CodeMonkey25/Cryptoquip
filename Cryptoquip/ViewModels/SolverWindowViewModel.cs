@@ -30,9 +30,10 @@ public class SolverWindowViewModel : ViewModelBase
     
     public SolverWindowViewModel() {}
 
-    public SolverWindowViewModel(string puzzle) : this()
+    public SolverWindowViewModel(string puzzle, bool enableExclusionAnalysis) : this()
     {
         Puzzle = puzzle;
+        EnableExclusionAnalysis = enableExclusionAnalysis;
         Task.Run(RunSolver);
     }
 

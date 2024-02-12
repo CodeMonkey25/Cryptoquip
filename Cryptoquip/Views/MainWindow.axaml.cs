@@ -35,6 +35,14 @@ public partial class MainWindow : Window
         set => SetAndRaise(RunSolverProperty, ref _runSolverCommand, value);
     }
     
+    public static readonly DirectProperty<MainWindow, bool> EnableExclusionAnalysisProperty = AvaloniaProperty.RegisterDirect<MainWindow, bool>(nameof(EnableExclusionAnalysis), o => o.EnableExclusionAnalysis, (o, v) => o.EnableExclusionAnalysis = v);
+    private bool _enableExclusionAnalysis = false;
+    public bool EnableExclusionAnalysis
+    {
+        get => _enableExclusionAnalysis;
+        set => SetAndRaise(EnableExclusionAnalysisProperty, ref _enableExclusionAnalysis, value);
+    }
+    
     public MainWindow()
     {
         InitializeComponent();
@@ -63,7 +71,7 @@ public partial class MainWindow : Window
     {
         if (!(DataContext is MainWindowViewModel mainWindowViewModel)) return;
 
-        SolverWindowViewModel solverWindowViewModel = new SolverWindowViewModel(mainWindowViewModel.OriginalMessage);
+        SolverWindowViewModel solverWindowViewModel = new(mainWindowViewModel.OriginalMessage, EnableExclusionAnalysis);
         SolverWindow dialog = new SolverWindow() { DataContext = solverWindowViewModel};
         string? result = await dialog.ShowDialog<string?>(this);
         if (string.IsNullOrWhiteSpace(result)) return;

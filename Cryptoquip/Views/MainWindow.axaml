@@ -30,6 +30,7 @@
                 <MenuItem Header="Paste" IsEnabled="False" />
             </MenuItem>
             <MenuItem Header="_Solver">
+                <CheckBox ClipToBounds="False" IsChecked="{Binding $parent[views:MainWindow].EnableExclusionAnalysis}">Enable Exclusion Analysis</CheckBox>
                 <MenuItem Header="Run Solver..." Command="{Binding $parent[views:MainWindow].RunSolverCommand}" />
             </MenuItem>
         </Menu>
