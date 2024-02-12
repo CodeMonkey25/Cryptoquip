@@ -9,8 +9,8 @@
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
         Title="Cryptoquip"
-        Width="640"
-        Height="480">
+        Width="1024"
+        Height="768">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,

@@ -3,12 +3,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Cryptoquip.ViewModels"
-             xmlns:views="clr-namespace:Cryptoquip.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Cryptoquip.Views.WordView"
              x:DataType="viewModels:WordViewModel"
              Background="DarkGray"
-             Margin="5 10"
+             Margin="10"
              Padding="1"
              PointerEntered="InputElement_OnPointerEntered"
              PointerExited="InputElement_OnPointerExited">
@@ -38,7 +37,7 @@
                 </Style>
             </Canvas.Styles>
             <Rectangle Canvas.Left="0" Canvas.Top="0" Width="20" Height="20" Fill="Transparent" />
-            <Polygon Points="5,10 15,10,10,18" StrokeThickness="1" />
+            <Polygon Points="5,10 15,10, 10,18" StrokeThickness="1" />
         </Canvas>
     </Grid>
 </UserControl>
