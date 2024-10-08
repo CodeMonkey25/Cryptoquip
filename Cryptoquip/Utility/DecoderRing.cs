@@ -3,10 +3,10 @@ using System.Linq;
 
 namespace Cryptoquip.Utility;
 
-public class DecoderRing
+public class DecoderRing : IDecoderRing
 {
     private Dictionary<char, char> _map = new Dictionary<char, char>();
-    private ISet<char> _hints = new HashSet<char>();
+    private readonly ISet<char> _hints = new HashSet<char>();
     public int SolveCount => _map.Count;
 
     public void Put(char letter, char match)
@@ -59,7 +59,7 @@ public class DecoderRing
         }
     }
 
-    internal string Decode(string message)
+    public string Decode(string message)
     {
         char[] chars = message.ToCharArray();
         for (int i = 0; i < chars.Length; i++)
@@ -69,12 +69,12 @@ public class DecoderRing
         return new string(chars);
     }
 
-    internal void Remove(char letter)
+    public void Remove(char letter)
     {
         _map.Remove(letter);
     }
 
-    internal bool Contains(char letter)
+    public bool Contains(char letter)
     {
         return _map.ContainsKey(letter);
     }
@@ -100,7 +100,7 @@ public class DecoderRing
         return _hints.Contains(letter);
     }
 
-    public DecoderRing Clone()
+    public IDecoderRing Clone()
     {
         DecoderRing that = new DecoderRing();
         that._map = this._map.ToDictionary(entry => entry.Key, entry => entry.Value);

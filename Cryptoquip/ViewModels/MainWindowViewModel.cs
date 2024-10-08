@@ -27,7 +27,7 @@ public class MainWindowViewModel : ViewModelBase
     
     public void LoadPuzzle(string puzzle)
     {
-        DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
+        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
         ring.Clear();
         
         string[] input = puzzle.ToUpper().Split("<HINT>:");
