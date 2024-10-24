@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Cryptoquip.Utility;
 
-public class DecoderRing : IDecoderRing
+public class DecoderRingDictionary : IDecoderRing
 {
     private Dictionary<char, char> _map = new Dictionary<char, char>();
     private readonly ISet<char> _hints = new HashSet<char>();
@@ -102,7 +102,7 @@ public class DecoderRing : IDecoderRing
 
     public IDecoderRing Clone()
     {
-        DecoderRing that = new DecoderRing();
+        DecoderRingDictionary that = new DecoderRingDictionary();
         that._map = this._map.ToDictionary(entry => entry.Key, entry => entry.Value);
         return that;
     }

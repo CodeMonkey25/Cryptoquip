@@ -25,7 +25,7 @@ public class SolverWindowViewModel : ViewModelBase
     public string Puzzle { get; set; } = string.Empty;
     
     private List<string> _skipWords = new List<string>();
-    private IDecoderRing _partialSolution = new DecoderRing();
+    private IDecoderRing _partialSolution = new DecoderRingDictionary();
     public bool EnableExclusionAnalysis { get; set; } = false;
     
     public SolverWindowViewModel() {}
