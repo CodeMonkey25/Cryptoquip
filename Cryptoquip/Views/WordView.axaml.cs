@@ -1,9 +1,7 @@
 ﻿using System.Linq;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using Cryptoquip.Extensions;
 using Cryptoquip.Models;
 using Cryptoquip.Utility;
@@ -42,7 +40,7 @@ public partial class WordView : UserControl
     {
         if (!(DataContext is WordViewModel vm)) return;
         
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
         WordList words = Locator.Current.GetRequiredService<WordList>();
         string[] candidates = words.GetMatches(vm.Word, ring);
         

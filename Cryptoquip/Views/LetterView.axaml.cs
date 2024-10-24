@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Avalonia;
+﻿using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Markup.Xaml;
 using Cryptoquip.Extensions;
 using Cryptoquip.Utility;
 using Cryptoquip.ViewModels;
@@ -41,12 +38,12 @@ public partial class LetterView : UserControl
         if (!char.IsLetter(vm.Letter)) return;
         if (vm.WasSetFromHint) return;
         
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
 
         MenuFlyout flyout = new MenuFlyout()
         {
             ItemsSource = ring
-                .GetUsedLetters()
+                .GetUnusedLetters()
                 .Prepend(' ')
                 .Select(c=> new MenuItem { Header = c.ToString(), Command = vm.SolveLetterCommand, CommandParameter = c})
                 .ToArray(),

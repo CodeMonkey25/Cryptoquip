@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Cryptoquip.Utility;
 using Cryptoquip.ViewModels;
 using ReactiveUI;

@@ -46,7 +46,7 @@ public class WordViewModel : ViewModelBase
     {
         foreach (char c in word)
         {
-            LetterViewModel vm = new LetterViewModel(c);
+            LetterViewModel vm;
             if (letterMap.TryGetValue(c, out LetterViewModel? value))
             {
                 vm = value;
@@ -65,7 +65,7 @@ public class WordViewModel : ViewModelBase
     
     public Unit SolveWord(string decodedWord)
     {
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
 
         foreach ((char l, char m) in Word.Text.Zip(decodedWord))
         {

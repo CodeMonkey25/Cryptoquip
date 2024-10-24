@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
-using System.Reactive;
-using System.Windows.Input;
 using Cryptoquip.Extensions;
 using Cryptoquip.Utility;
 using ReactiveUI;
@@ -21,13 +18,13 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _words, value);
     }
 
-    public string OriginalMessage { get; set; }
+    public string OriginalMessage { get; private set; } = string.Empty;
     
     public MainWindowViewModel() { }
     
     public void LoadPuzzle(string puzzle)
     {
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
         ring.Clear();
         
         string[] input = puzzle.ToUpper().Split("<HINT>:");

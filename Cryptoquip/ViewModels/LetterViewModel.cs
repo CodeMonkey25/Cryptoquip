@@ -53,14 +53,14 @@ public class LetterViewModel : ViewModelBase
     {
         Letter = letter;
         
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
         DecodedLetter = ring.Get(letter);
         WasSetFromHint = ring.WasSetFromHint(letter);
     }
 
     public Unit SolveLetter(char decodedLetter)
     {
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
 
         if (decodedLetter == ' ')
             ring.Remove(Letter);
@@ -73,7 +73,7 @@ public class LetterViewModel : ViewModelBase
 
     public void Update()
     {
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
         DecodedLetter = ring.Get(Letter);
     }
 }

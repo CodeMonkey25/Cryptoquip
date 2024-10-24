@@ -23,7 +23,7 @@ public class WordList
         return _words.GetValueOrDefault(word.Pattern, Array.Empty<string>());
     }
 
-    public string[] GetMatches(Word word, IDecoderRing ring)
+    public string[] GetMatches(Word word, DecoderRingAbstract ring)
     {
         return _words
             .GetValueOrDefault(word.Pattern, Array.Empty<string>())

@@ -25,7 +25,7 @@ public class SolverWindowViewModel : ViewModelBase
     public string Puzzle { get; set; } = string.Empty;
     
     private List<string> _skipWords = new List<string>();
-    private IDecoderRing _partialSolution = new DecoderRingDictionary();
+    private DecoderRingAbstract _partialSolution = new DecoderRingNull();
     public bool EnableExclusionAnalysis { get; set; } = false;
     
     public SolverWindowViewModel() {}
@@ -45,7 +45,7 @@ public class SolverWindowViewModel : ViewModelBase
     private void RunSolver()
     {
         Stopwatch watch = Stopwatch.StartNew();
-        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>().Clone();
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>().Clone();
         WordList wordList = Locator.Current.GetRequiredService<WordList>();
 
         LogMessage($"Received puzzle: {Puzzle}");
@@ -127,7 +127,7 @@ public class SolverWindowViewModel : ViewModelBase
         LogMessage($"Total run time: {watch.Elapsed.ReadableTime()}");
     }
     
-    private bool _solveLoop(IDecoderRing ring, Word[] words, int depth)
+    private bool _solveLoop(DecoderRingAbstract ring, Word[] words, int depth)
     {
         // depth exceeds the length of the array, we must have solved it...
         if (depth >= words.Length) return true;
