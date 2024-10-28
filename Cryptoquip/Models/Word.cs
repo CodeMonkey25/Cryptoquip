@@ -18,26 +18,26 @@ public class Word
         Matches = Array.Empty<string>();
     }
 
-    static public string MakePattern(string text)
+    public static string MakePattern(string text)
     {
-        const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        int currentLetterIndex = 0;
-        Dictionary<char, char> seen = new Dictionary<char, char>();
+        char[] patternMap = Enumerable.Range(0, 26).Select(_ => '-').ToArray();
+        int patternDepth = 0;
         char[] chars = text.ToCharArray();
         for (int i = 0; i < chars.Length; i++)
         {
             char c = chars[i];
             if (!char.IsLetter(c)) continue;
 
-            char match;
-            if (seen.TryGetValue(c, out match))
+            int patternIndex = c - 'A';
+            char match = patternMap[patternIndex];
+            if (match != '-')
             {
                 chars[i] = match;
                 continue;
             }
-            match = alphabet[currentLetterIndex];
-            currentLetterIndex++;
-            seen.Add(chars[i], match);
+            match = (char)('A' + patternDepth);
+            patternDepth++;
+            patternMap[patternIndex] = match;
             chars[i] = match;
         }
         return new string(chars);
