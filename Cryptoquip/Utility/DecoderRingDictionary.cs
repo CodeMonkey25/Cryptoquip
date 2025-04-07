@@ -31,6 +31,11 @@ public class DecoderRingDictionary : DecoderRingAbstract
         return _map.ContainsKey(letter);
     }
 
+    public override IEnumerable<char> GetUsedLetters()
+    {
+        return _map.Keys;
+    }
+    
     public override bool UsedContains(char letter)
     {
         return _map.ContainsValue(letter);

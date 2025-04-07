@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Cryptoquip.Utility;
@@ -15,6 +16,7 @@ public class DecoderRingNull : DecoderRingAbstract
     public override bool Contains(char letter) => false;
     public override bool UsedContains(char letter) => false;
     public override void Clear() { }
+    public override IEnumerable<char> GetUsedLetters() => Enumerable.Empty<char>();
     public override IEnumerable<char> GetUnusedLetters() => Enumerable.Empty<char>();
     public override bool WasSetFromHint(char letter) => false;
     public override DecoderRingAbstract Clone() => new DecoderRingNull();

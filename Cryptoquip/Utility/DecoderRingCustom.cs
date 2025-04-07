@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Cryptoquip.Utility;
 
@@ -47,6 +48,11 @@ public class DecoderRingCustom : DecoderRingAbstract
         return false;
     }
 
+    public override IEnumerable<char> GetUsedLetters()
+    {
+        return _cypher.Where(c => c != '-');
+    }
+    
     public override bool UsedContains(char letter)
     {
         return _cypher.Contains(letter);

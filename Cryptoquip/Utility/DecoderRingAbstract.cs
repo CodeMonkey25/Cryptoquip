@@ -65,13 +65,14 @@ public abstract class DecoderRingAbstract
         _hints.Clear();
     }
 
+    public abstract IEnumerable<char> GetUsedLetters();
+    
     public virtual IEnumerable<char> GetUnusedLetters()
     {
-        char[] all = Enumerable.Range(0, 26)
+        return Enumerable.Range(0, 26)
             .Select(i => (char)('A' + i))
+            .Except(GetUsedLetters())
             .ToArray();
-        
-        return all.Where(c => !UsedContains(c));
     }
     
     public virtual bool WasSetFromHint(char letter)

@@ -70,9 +70,9 @@ public class Word
     
     private bool MatchesRequirements(string match, IReadOnlyDictionary<char, ISet<char>> required)
     {
-        foreach ((char l, char m) in Text.Zip(match))
+        foreach ((char l, char m) in Text.Zip(match).Distinct())
         {
-            if (!required.TryGetValue(l, out ISet<char> set)) continue;
+            if (!required.TryGetValue(l, out var set)) continue;
             if (set.Contains(m)) continue;
             return false;
         }
