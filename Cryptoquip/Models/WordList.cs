@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,13 +10,14 @@ namespace Cryptoquip.Models;
 public class WordList
 {
     private const string DictionaryFileName = @"dictionary.txt";
-    private readonly Dictionary<string,string[]> _words;
+    private readonly FrozenDictionary<string,string[]> _words;
 
     public WordList()
     {
         _words = File.ReadLines(DictionaryFileName)
+            .AsParallel()
             .GroupBy(Word.MakePattern)
-            .ToDictionary(g => g.Key, g => g.ToArray());
+            .ToFrozenDictionary(static g => g.Key, static g => g.ToArray());
     }
 
     public string[] GetMatches(Word word)

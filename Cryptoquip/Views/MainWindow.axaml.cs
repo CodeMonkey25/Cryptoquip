@@ -10,7 +10,7 @@ namespace Cryptoquip.Views;
 
 public partial class MainWindow : Window
 {
-    public static readonly DirectProperty<MainWindow, ICommand> LoadCommandProperty = AvaloniaProperty.RegisterDirect<MainWindow, ICommand>(nameof(LoadPuzzleCommand), o => o.LoadPuzzleCommand, (o, v) => o.LoadPuzzleCommand = v);
+    public static readonly DirectProperty<MainWindow, ICommand> LoadCommandProperty = AvaloniaProperty.RegisterDirect<MainWindow, ICommand>(nameof(LoadPuzzleCommand), static o => o.LoadPuzzleCommand, static (o, v) => o.LoadPuzzleCommand = v);
     private ICommand _loadPuzzleCommand = NullCommand.Instance;
     public ICommand LoadPuzzleCommand
     {
@@ -18,7 +18,7 @@ public partial class MainWindow : Window
         set => SetAndRaise(LoadCommandProperty, ref _loadPuzzleCommand, value);
     }
     
-    public static readonly DirectProperty<MainWindow, ICommand> ExitCommandProperty = AvaloniaProperty.RegisterDirect<MainWindow, ICommand>(nameof(ExitCommand), o => o.ExitCommand, (o, v) => o.ExitCommand = v);
+    public static readonly DirectProperty<MainWindow, ICommand> ExitCommandProperty = AvaloniaProperty.RegisterDirect<MainWindow, ICommand>(nameof(ExitCommand), static o => o.ExitCommand, static (o, v) => o.ExitCommand = v);
     private ICommand _exitCommand = NullCommand.Instance;
     public ICommand ExitCommand
     {
@@ -26,7 +26,7 @@ public partial class MainWindow : Window
         set => SetAndRaise(ExitCommandProperty, ref _exitCommand, value);
     }
     
-    public static readonly DirectProperty<MainWindow, ICommand> RunSolverProperty = AvaloniaProperty.RegisterDirect<MainWindow, ICommand>(nameof(RunSolverCommand), o => o.RunSolverCommand, (o, v) => o.RunSolverCommand = v);
+    public static readonly DirectProperty<MainWindow, ICommand> RunSolverProperty = AvaloniaProperty.RegisterDirect<MainWindow, ICommand>(nameof(RunSolverCommand), static o => o.RunSolverCommand, static (o, v) => o.RunSolverCommand = v);
     private ICommand _runSolverCommand = NullCommand.Instance;
     public ICommand RunSolverCommand
     {
@@ -34,7 +34,7 @@ public partial class MainWindow : Window
         set => SetAndRaise(RunSolverProperty, ref _runSolverCommand, value);
     }
     
-    public static readonly DirectProperty<MainWindow, bool> EnableExclusionAnalysisProperty = AvaloniaProperty.RegisterDirect<MainWindow, bool>(nameof(EnableExclusionAnalysis), o => o.EnableExclusionAnalysis, (o, v) => o.EnableExclusionAnalysis = v);
+    public static readonly DirectProperty<MainWindow, bool> EnableExclusionAnalysisProperty = AvaloniaProperty.RegisterDirect<MainWindow, bool>(nameof(EnableExclusionAnalysis), static o => o.EnableExclusionAnalysis, static (o, v) => o.EnableExclusionAnalysis = v);
     private bool _enableExclusionAnalysis = false;
     public bool EnableExclusionAnalysis
     {

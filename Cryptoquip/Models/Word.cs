@@ -20,7 +20,7 @@ public class Word
 
     public static string MakePattern(string text)
     {
-        char[] patternMap = Enumerable.Range(0, 26).Select(_ => '-').ToArray();
+        char[] patternMap = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
         int patternDepth = 0;
         char[] chars = text.ToCharArray();
         for (int i = 0; i < chars.Length; i++)

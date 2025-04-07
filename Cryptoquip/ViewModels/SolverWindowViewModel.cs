@@ -53,11 +53,11 @@ public class SolverWindowViewModel : ViewModelBase
         
         Word[] words = Regex.Replace(Puzzle, "[^A-Z0-9']", " ")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries)
-            .Where(w => w.Any(char.IsLetter))
-            .Where(w => !w.Any(char.IsNumber))
+            .Where(static w => w.Any(char.IsLetter))
+            .Where(static w => !w.Any(char.IsNumber))
             .Where(w => !_skipWords.Contains(w))
             .Distinct()
-            .Select(w => new Word(w))
+            .Select(static w => new Word(w))
             .ToArray();
         LogMessage($"Found {words.Length} unique words to solve.");
         
@@ -66,7 +66,7 @@ public class SolverWindowViewModel : ViewModelBase
         {
             word.Matches = wordList.GetMatches(word, ring);
         }
-        words = words.OrderBy(w => w.Matches.Length).ThenByDescending(w => w.Text.Length).ToArray();
+        words = words.OrderBy(static w => w.Matches.Length).ThenByDescending(static w => w.Text.Length).ToArray();
         
         foreach (Word word in words)
         {
@@ -99,7 +99,7 @@ public class SolverWindowViewModel : ViewModelBase
             }
             LogMessage();
 			
-            words = words.OrderBy(w => w.Matches.Length).ThenByDescending(w => w.Text.Length).ToArray();
+            words = words.OrderBy(static w => w.Matches.Length).ThenByDescending(static w => w.Text.Length).ToArray();
             foreach (Word word in words)
             {
                 LogMessage("\t" + word.Text + " (" + word.Matches.Length + ")");

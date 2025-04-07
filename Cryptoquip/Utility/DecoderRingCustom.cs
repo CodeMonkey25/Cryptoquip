@@ -5,8 +5,8 @@ namespace Cryptoquip.Utility;
 
 public class DecoderRingCustom : DecoderRingAbstract
 {
-    private char[] _cypher = Enumerable.Range(0, 26).Select(_ => '-').ToArray();
-    public override int SolveCount => _cypher.Length - _cypher.Count(c => c != '-');
+    private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
+    public override int SolveCount => _cypher.Length - _cypher.Count(static c => c != '-');
 
     public override void Put(char letter, char match)
     {
@@ -50,7 +50,7 @@ public class DecoderRingCustom : DecoderRingAbstract
 
     public override IEnumerable<char> GetUsedLetters()
     {
-        return _cypher.Where(c => c != '-');
+        return _cypher.Where(static c => c != '-');
     }
     
     public override bool UsedContains(char letter)

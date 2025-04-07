@@ -50,7 +50,7 @@ public class DecoderRingDictionary : DecoderRingAbstract
     public override DecoderRingAbstract Clone()
     {
         DecoderRingDictionary that = new DecoderRingDictionary();
-        that._map = this._map.ToDictionary(entry => entry.Key, entry => entry.Value);
+        that._map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value);
         that._hints = this._hints.ToHashSet();
         return that;
     }

@@ -38,9 +38,9 @@ public abstract class DecoderRingAbstract
 
     public virtual void LoadHints(string hints)
     {
-        foreach (string hint in hints.Split(",").Select(h => h.Trim()))
+        foreach (string hint in hints.Split(",").Select(static h => h.Trim()))
         {
-            string[] parts = hint.Split("=").Select(h => h.Trim()).ToArray();
+            string[] parts = hint.Split("=").Select(static h => h.Trim()).ToArray();
             if (parts.Length != 2) continue;
             if (parts[0].Length != parts[1].Length) continue;
 
@@ -70,7 +70,7 @@ public abstract class DecoderRingAbstract
     public virtual IEnumerable<char> GetUnusedLetters()
     {
         return Enumerable.Range(0, 26)
-            .Select(i => (char)('A' + i))
+            .Select(static i => (char)('A' + i))
             .Except(GetUsedLetters())
             .ToArray();
     }
