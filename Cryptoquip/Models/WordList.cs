@@ -10,14 +10,16 @@ namespace Cryptoquip.Models;
 public class WordList
 {
     private const string DictionaryFileName = @"dictionary.txt";
-    private readonly FrozenDictionary<string,string[]> _words;
+    private readonly FrozenDictionary<char[],string[]> _words;
 
     public WordList()
     {
+        IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
+        
         _words = File.ReadLines(DictionaryFileName)
             .AsParallel()
-            .GroupBy(Word.MakePattern)
-            .ToFrozenDictionary(static g => g.Key, static g => g.ToArray());
+            .GroupBy(Word.MakePattern, comparer)
+            .ToFrozenDictionary(static g => g.Key, static g => g.ToArray(), comparer);
     }
 
     public string[] GetMatches(Word word)
