@@ -5,7 +5,7 @@ namespace Cryptoquip.Utility;
 
 public class DecoderRingDictionary : DecoderRingAbstract
 {
-    private Dictionary<char, char> _map = new Dictionary<char, char>();
+    private Dictionary<char, char> _map = new();
     public override int SolveCount => _map.Count;
 
     public override void Put(char letter, char match)
@@ -49,9 +49,11 @@ public class DecoderRingDictionary : DecoderRingAbstract
 
     public override DecoderRingAbstract Clone()
     {
-        DecoderRingDictionary that = new DecoderRingDictionary();
-        that._map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value);
-        that._hints = this._hints.ToHashSet();
+        DecoderRingDictionary that = new()
+        {
+            _map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value),
+            _hints = this._hints.ToHashSet()
+        };
         return that;
     }
 }

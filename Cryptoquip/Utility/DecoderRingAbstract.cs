@@ -5,7 +5,7 @@ namespace Cryptoquip.Utility;
 
 public abstract class DecoderRingAbstract
 {
-    protected HashSet<char> _hints = new HashSet<char>();
+    protected HashSet<char> _hints = [];
     
     public abstract int SolveCount { get; }
     public abstract void Put(char letter, char match);

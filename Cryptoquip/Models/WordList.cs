@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Frozen;
+﻿using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,19 +17,20 @@ public class WordList
         
         _words = File.ReadLines(DictionaryFileName)
             .AsParallel()
+            .WithMergeOptions(ParallelMergeOptions.NotBuffered)
             .GroupBy(Word.MakePattern, comparer)
             .ToFrozenDictionary(static g => g.Key, static g => g.ToArray(), comparer);
     }
 
     public string[] GetMatches(Word word)
     {
-        return _words.GetValueOrDefault(word.Pattern, Array.Empty<string>());
+        return _words.GetValueOrDefault(word.Pattern, []);
     }
 
     public string[] GetMatches(Word word, DecoderRingAbstract ring)
     {
         return _words
-            .GetValueOrDefault(word.Pattern, Array.Empty<string>())
+            .GetValueOrDefault(word.Pattern, [])
             .Where(w => ring.Matches(word.Text, w))
             .ToArray();
     }

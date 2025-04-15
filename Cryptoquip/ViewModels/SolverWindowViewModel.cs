@@ -22,11 +22,11 @@ public class SolverWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _logText, value);
     }
 
-    public string Puzzle { get; set; } = string.Empty;
+    public string Puzzle { get; } = string.Empty;
     
-    private readonly List<string> _skipWords = new List<string>();
+    private readonly List<string> _skipWords = new();
     private DecoderRingAbstract _partialSolution = new DecoderRingNull();
-    public bool EnableExclusionAnalysis { get; set; } = false;
+    public bool EnableExclusionAnalysis { get; }
     
     public SolverWindowViewModel() {}
 
@@ -85,7 +85,7 @@ public class SolverWindowViewModel : ViewModelBase
                 deleted = 0;
                 foreach (Word word in words)
                 {
-                    IReadOnlyDictionary<char, ISet<char>> required = word.GetMatchRequirements();
+                    Dictionary<char, HashSet<char>> required = word.GetMatchRequirements();
                     if(required.Count == 0) continue;
                     foreach (Word otherWord in words)
                     {
@@ -142,7 +142,7 @@ public class SolverWindowViewModel : ViewModelBase
         foreach(string possibleMatch in possibleMatches)
         {
             // add candidate letter matches
-            HashSet<char> candidates = new HashSet<char>();
+            HashSet<char> candidates = [];
             foreach ((char l, char m) in word.Text.Zip(possibleMatch))
             {
                 if (!char.IsLetter(l)) continue;

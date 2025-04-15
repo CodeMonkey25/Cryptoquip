@@ -50,7 +50,7 @@ public class DecoderRingCustom : DecoderRingAbstract
 
     public override IEnumerable<char> GetUsedLetters()
     {
-        return _cypher.Where(static c => c != '-');
+        return _cypher.Where(static c => c != '-').ToHashSet();
     }
     
     public override bool UsedContains(char letter)
@@ -67,9 +67,11 @@ public class DecoderRingCustom : DecoderRingAbstract
 
     public override DecoderRingAbstract Clone()
     {
-        DecoderRingCustom that = new DecoderRingCustom();
-        that._cypher = this._cypher.ToArray();
-        that._hints = this._hints.ToHashSet();
+        DecoderRingCustom that = new()
+        {
+            _cypher = this._cypher.ToArray(),
+            _hints = this._hints.ToHashSet()
+        };
         return that;
     }
 }

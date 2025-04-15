@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Cryptoquip.Models;
@@ -15,7 +14,7 @@ public class Word
     {
         Text = text;
         Pattern = MakePattern(text);
-        Matches = Array.Empty<string>();
+        Matches = [];
     }
 
     public static char[] MakePattern(string text)
@@ -43,36 +42,36 @@ public class Word
         return chars;
     }
 
-    public Dictionary<char, ISet<char>> GetMatchRequirements()
+    public Dictionary<char, HashSet<char>> GetMatchRequirements()
     {
-        Dictionary<char, ISet<char>> map = new();
+        Dictionary<char, HashSet<char>> map = new();
         foreach (string match in Matches)
         {
             foreach ((char l, char m) in Text.Zip(match))
             {
-                if (map.ContainsKey(l))
+                if (map.TryGetValue(l, out HashSet<char>? set))
                 {
-                    map[l].Add(m);
+                    set.Add(m);
                 }
                 else
                 {
-                    map[l] = new HashSet<char>(new[] { m });
+                    map[l] = [m];
                 }
             }
         }
         return map;
     }
 
-    public void EnsureMatchRequirements(IReadOnlyDictionary<char, ISet<char>> required)
+    public void EnsureMatchRequirements(IReadOnlyDictionary<char, HashSet<char>> required)
     {
         Matches = Matches.Where(m => MatchesRequirements(m, required)).ToArray();
     }
     
-    private bool MatchesRequirements(string match, IReadOnlyDictionary<char, ISet<char>> required)
+    private bool MatchesRequirements(string match, IReadOnlyDictionary<char, HashSet<char>> required)
     {
         foreach ((char l, char m) in Text.Zip(match).Distinct())
         {
-            if (!required.TryGetValue(l, out var set)) continue;
+            if (!required.TryGetValue(l, out HashSet<char>? set)) continue;
             if (set.Contains(m)) continue;
             return false;
         }
