@@ -47,8 +47,10 @@ public class Word
         Dictionary<char, HashSet<char>> map = new();
         foreach (string match in Matches)
         {
-            foreach ((char l, char m) in Text.Zip(match))
+            for (int i = 0; i < match.Length; i++)
             {
+                char l = Text[i];
+                char m = match[i];
                 if (map.TryGetValue(l, out HashSet<char>? set))
                 {
                     set.Add(m);
@@ -69,10 +71,14 @@ public class Word
     
     private bool MatchesRequirements(string match, IReadOnlyDictionary<char, HashSet<char>> required)
     {
-        foreach ((char l, char m) in Text.Zip(match).Distinct())
+        for (int i = 0; i < match.Length; i++)
         {
+            char l = Text[i];
             if (!required.TryGetValue(l, out HashSet<char>? set)) continue;
+
+            char m = match[i];
             if (set.Contains(m)) continue;
+            
             return false;
         }
         return true;

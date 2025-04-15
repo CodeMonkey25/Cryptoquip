@@ -143,14 +143,17 @@ public class SolverWindowViewModel : ViewModelBase
         {
             // add candidate letter matches
             HashSet<char> candidates = [];
-            foreach ((char l, char m) in word.Text.Zip(possibleMatch))
+            for (int i = 0; i < word.Text.Length; i++)
             {
+                char l = word.Text[i];
                 if (!char.IsLetter(l)) continue;
                 if (ring.Contains(l)) continue;
+
+                char m = possibleMatch[i];
                 ring.Put(l, m);
                 candidates.Add(l);
             }
-			
+
             // recurse, returning if the puzzle is solved...
             if (_solveLoop(ring, words, depth + 1))
                 return true;
