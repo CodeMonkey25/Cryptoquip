@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cryptoquip.Utility;
+namespace Cryptoquip.Services;
 
 public class DecoderRingNull : DecoderRingAbstract
 {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using Cryptoquip.Extensions;
 using Cryptoquip.Models;
-using Cryptoquip.Utility;
+using Cryptoquip.Services;
 using ReactiveUI;
 using Splat;
 
@@ -22,19 +22,16 @@ public class SolverWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _logText, value);
     }
 
-    public string Puzzle { get; } = string.Empty;
-    
     private readonly List<string> _skipWords = new();
     private DecoderRingAbstract _partialSolution = new DecoderRingNull();
-    public bool EnableExclusionAnalysis { get; }
     
     public SolverWindowViewModel() {}
 
     public SolverWindowViewModel(string puzzle, bool enableExclusionAnalysis) : this()
     {
-        Puzzle = puzzle;
-        EnableExclusionAnalysis = enableExclusionAnalysis;
-        Task.Run(RunSolver);
+        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>().Clone();
+        WordList wordList = Locator.Current.GetRequiredService<WordList>();
+        Task.Run(() => RunSolver(ring, wordList, puzzle, enableExclusionAnalysis));
     }
 
     private void LogMessage(string message = "")
@@ -42,16 +39,14 @@ public class SolverWindowViewModel : ViewModelBase
         Dispatcher.UIThread.Post(() => LogText += message + Environment.NewLine);
     }
 
-    private void RunSolver()
+    private void RunSolver(DecoderRingAbstract ring, WordList wordList, string puzzle, bool enableExclusionAnalysis)
     {
         Stopwatch watch = Stopwatch.StartNew();
-        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>().Clone();
-        WordList wordList = Locator.Current.GetRequiredService<WordList>();
 
-        LogMessage($"Received puzzle: {Puzzle}");
+        LogMessage($"Received puzzle: {puzzle}");
         LogMessage();
         
-        Word[] words = Regex.Replace(Puzzle, "[^A-Z0-9']", " ")
+        Word[] words = Regex.Replace(puzzle, "[^A-Z0-9']", " ")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries)
             .Where(static w => w.Any(char.IsLetter))
             .Where(static w => !w.Any(char.IsNumber))
@@ -74,7 +69,7 @@ public class SolverWindowViewModel : ViewModelBase
         }
         LogMessage($"Word matches are ready.");
         
-        if (EnableExclusionAnalysis)
+        if (enableExclusionAnalysis)
         {
             LogMessage();
             LogMessage("Performing exclusion analysis...");
@@ -120,7 +115,7 @@ public class SolverWindowViewModel : ViewModelBase
         }
         
         LogMessage();
-        LogMessage(ring.Decode(Puzzle));
+        LogMessage(ring.Decode(puzzle));
         watch.Stop();
         
         LogMessage();

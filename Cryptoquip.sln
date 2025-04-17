@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip", "Cryptoquip\Cryptoquip.csproj", "{BAAECB0B-3C20-4A0C-913D-8CBD4C52B613}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip.Desktop", "Cryptoquip.Desktop\Cryptoquip.Desktop.csproj", "{BAAECB0B-3C20-4A0C-913D-8CBD4C52B613}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip.Core", "Cryptoquip.Core\Cryptoquip.Core.csproj", "{69CBFD92-1030-4077-AC5C-C4738A92E15C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +14,9 @@ Global
 		{BAAECB0B-3C20-4A0C-913D-8CBD4C52B613}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAAECB0B-3C20-4A0C-913D-8CBD4C52B613}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAAECB0B-3C20-4A0C-913D-8CBD4C52B613}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69CBFD92-1030-4077-AC5C-C4738A92E15C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69CBFD92-1030-4077-AC5C-C4738A92E15C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69CBFD92-1030-4077-AC5C-C4738A92E15C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69CBFD92-1030-4077-AC5C-C4738A92E15C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

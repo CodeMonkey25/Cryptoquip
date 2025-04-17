@@ -2,7 +2,7 @@
 using Avalonia.ReactiveUI;
 using System;
 using Cryptoquip.Models;
-using Cryptoquip.Utility;
+using Cryptoquip.Services;
 using Splat;
 
 namespace Cryptoquip;

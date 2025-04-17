@@ -4,7 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Cryptoquip.Extensions;
 using Cryptoquip.Models;
-using Cryptoquip.Utility;
+using Cryptoquip.Services;
 using Cryptoquip.ViewModels;
 using Splat;
 

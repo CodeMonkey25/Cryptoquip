@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Input;
 using Cryptoquip.Extensions;
 using Cryptoquip.Models;
+using Cryptoquip.Services;
 using Cryptoquip.Utility;
 using ReactiveUI;
 using Splat;

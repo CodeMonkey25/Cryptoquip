@@ -5,7 +5,7 @@
         xmlns:viewModels="clr-namespace:Cryptoquip.ViewModels"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="250"
         x:Class="Cryptoquip.Views.SolverWindow"
-        Title="Cryptoquip Solver"
+        Title="Cryptoquip.Desktop Solver"
         Width="800" Height="500"
         x:DataType="viewModels:SolverWindowViewModel">
 
