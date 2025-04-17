@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip.Desktop", "Crypt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip.Core", "Cryptoquip.Core\Cryptoquip.Core.csproj", "{69CBFD92-1030-4077-AC5C-C4738A92E15C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoquipConsole", "CryptoquipConsole\CryptoquipConsole.csproj", "{A8E7966B-7802-4CF7-B9E0-431515312743}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{69CBFD92-1030-4077-AC5C-C4738A92E15C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69CBFD92-1030-4077-AC5C-C4738A92E15C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69CBFD92-1030-4077-AC5C-C4738A92E15C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8E7966B-7802-4CF7-B9E0-431515312743}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8E7966B-7802-4CF7-B9E0-431515312743}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8E7966B-7802-4CF7-B9E0-431515312743}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8E7966B-7802-4CF7-B9E0-431515312743}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
