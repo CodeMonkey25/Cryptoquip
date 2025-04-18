@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Cryptoquip.Extensions;
+using Cryptoquip.Models;
 using Cryptoquip.Services;
 using ReactiveUI;
 using Splat;
@@ -18,23 +19,17 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _words, value);
     }
 
-    public string OriginalMessage { get; private set; } = string.Empty;
+    public Puzzle? Puzzle { get; private set; }
 
-    public void LoadPuzzle(string puzzle)
+    public void LoadPuzzle(string text)
     {
         DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
-        ring.Clear();
         
-        string[] input = puzzle.ToUpper().Split("<HINT>:");
-        OriginalMessage = input.First();
-        if (input.Length >= 2)
-        {
-            ring.LoadHints(input[1]);
-        }
+        Puzzle = new(text, ring);
         
         Words.Clear();
         Dictionary<char, LetterViewModel> letterMap = new();
-        foreach (string word in input.First().Split(" ", StringSplitOptions.RemoveEmptyEntries))
+        foreach (string word in Puzzle.GetWords())
         {
             Words.Add(new WordViewModel(word, letterMap));
         }

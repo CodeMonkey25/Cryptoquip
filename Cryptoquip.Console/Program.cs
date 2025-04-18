@@ -9,12 +9,15 @@ class Program
 {
     static void Main(string[] args)
     {
-        const string puzzle = "X KYP Y DSSW SF EYEEG'K BYVU LSEYG YFE YDD SB Y KHEEUF X BSHFE CGKUDB DSSWXFN YL RXC FSL YK CG EYEEG OHL YK YFSLRUZ CYF. CYGOU X'C NZSPXFN HQ Y DXLLDU. CYGOU XL PYK LRU QYXF XF RXK BYVU. OHL XL VYCU LS CU LRYL BSZ YDD LRU QDUYKHZU CSCCY YFE EYEEG BXFE XF HK VRXDEZUF, LRUZU YZU SLRUZ LXCUK XL CHKL OU RUYZLOZUYWXFN LS LRUC.";
+        const string text = "X KYP Y DSSW SF EYEEG'K BYVU LSEYG YFE YDD SB Y KHEEUF X BSHFE CGKUDB DSSWXFN YL RXC FSL YK CG EYEEG OHL YK YFSLRUZ CYF. CYGOU X'C NZSPXFN HQ Y DXLLDU. CYGOU XL PYK LRU QYXF XF RXK BYVU. OHL XL VYCU LS CU LRYL BSZ YDD LRU QDUYKHZU CSCCY YFE EYEEG BXFE XF HK VRXDEZUF, LRUZU YZU SLRUZ LXCUK XL CHKL OU RUYZLOZUYWXFN LS LRUC. <HINT>:EYEEG'K=DADDY'S";
      
         Stopwatch watch = Stopwatch.StartNew();
-
+        
+        DecoderRingAbstract ring = new DecoderRingCustom();
+        Puzzle puzzle = new(text, ring);
+        WordList words = new();
         Solver solver = new();
-        solver.Run(LogMessage, new DecoderRingCustom(), new WordList(), puzzle, false);
+        solver.Run(LogMessage, ring, words, puzzle, false);
         watch.Stop();
         
         LogMessage(string.Empty);

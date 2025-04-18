@@ -8,13 +8,13 @@ public class Solver
     private readonly List<string> _skipWords = new();
     private DecoderRingAbstract _partialSolution = new DecoderRingNull();
     
-    public void Run(Action<string> logMessage, DecoderRingAbstract ring, WordList wordList, string puzzle,
+    public void Run(Action<string> logMessage, DecoderRingAbstract ring, WordList wordList, Puzzle puzzle,
         bool enableExclusionAnalysis)
     {
         logMessage($"Received puzzle: {puzzle}");
         logMessage(string.Empty);
         
-        Word[] words = Regex.Replace(puzzle, "[^A-Z0-9']", " ")
+        Word[] words = Regex.Replace(puzzle.Text, "[^A-Z0-9']", " ")
             .Split(" ", StringSplitOptions.RemoveEmptyEntries)
             .Where(static w => w.Any(char.IsLetter))
             .Where(static w => !w.Any(char.IsNumber))
@@ -83,7 +83,7 @@ public class Solver
         }
         
         logMessage(string.Empty);
-        logMessage(ring.Decode(puzzle));
+        logMessage(ring.Decode(puzzle.Text));
     }
     
     private bool _solveLoop(DecoderRingAbstract ring, Word[] words, int depth)

@@ -12,7 +12,7 @@ namespace Cryptoquip.ViewModels;
 
 public class SolverWindowViewModel : ViewModelBase
 {
-    private string Puzzle { get; } = string.Empty;
+    private Puzzle? Puzzle { get; }
     private bool EnableExclusionAnalysis { get; }
     private DecoderRingAbstract Ring { get; } = new DecoderRingNull();
     private WordList? Words { get; }
@@ -26,7 +26,7 @@ public class SolverWindowViewModel : ViewModelBase
 
     public SolverWindowViewModel() {}
 
-    public SolverWindowViewModel(string puzzle, bool enableExclusionAnalysis) : this()
+    public SolverWindowViewModel(Puzzle puzzle, bool enableExclusionAnalysis) : this()
     {
         Puzzle = puzzle;
         EnableExclusionAnalysis = enableExclusionAnalysis;
