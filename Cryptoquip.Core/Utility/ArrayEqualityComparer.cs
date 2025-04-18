@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Cryptoquip.Utility;
+﻿namespace Cryptoquip.Utility;
 
 public sealed class ArrayEqualityComparer<T> : IEqualityComparer<T[]> where T : notnull
 {

@@ -1,8 +1,4 @@
-﻿using System.Collections.Frozen;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Cryptoquip.Services;
+﻿using Cryptoquip.Services;
 using Cryptoquip.Utility;
 
 namespace Cryptoquip.Models;
@@ -10,17 +6,17 @@ namespace Cryptoquip.Models;
 public class WordList
 {
     private const string DictionaryFileName = @"dictionary.txt";
-    private readonly FrozenDictionary<char[],string[]> _words;
+    private readonly Dictionary<char[],string[]> _words;
 
     public WordList()
     {
         IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
         
-        _words = File.ReadLines(DictionaryFileName)
-            .AsParallel()
-            .WithMergeOptions(ParallelMergeOptions.NotBuffered)
+        _words = File.ReadAllLines(DictionaryFileName)
+            // .AsParallel()
+            // .WithMergeOptions(ParallelMergeOptions.NotBuffered)
             .GroupBy(Word.MakePattern, comparer)
-            .ToFrozenDictionary(static g => g.Key, static g => g.ToArray(), comparer);
+            .ToDictionary(static g => g.Key, static g => g.ToArray(), comparer);
     }
 
     public string[] GetMatches(Word word)

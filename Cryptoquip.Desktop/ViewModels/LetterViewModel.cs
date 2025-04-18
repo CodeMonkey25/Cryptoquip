@@ -24,7 +24,7 @@ public class LetterViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _decodedLetter, value);
     }
 
-    private bool _isMouseOver = false;
+    private bool _isMouseOver;
     public bool IsMouseOver
     {
         get => _isMouseOver;

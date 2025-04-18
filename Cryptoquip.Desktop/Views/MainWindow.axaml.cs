@@ -35,7 +35,7 @@ public partial class MainWindow : Window
     }
     
     public static readonly DirectProperty<MainWindow, bool> EnableExclusionAnalysisProperty = AvaloniaProperty.RegisterDirect<MainWindow, bool>(nameof(EnableExclusionAnalysis), static o => o.EnableExclusionAnalysis, static (o, v) => o.EnableExclusionAnalysis = v);
-    private bool _enableExclusionAnalysis = false;
+    private bool _enableExclusionAnalysis;
     public bool EnableExclusionAnalysis
     {
         get => _enableExclusionAnalysis;
@@ -50,11 +50,11 @@ public partial class MainWindow : Window
         RunSolverCommand = ReactiveCommand.Create(RunSolver);
     }
 
-    public async Task LoadPuzzle()
+    private async Task LoadPuzzle()
     {
-        if (!(DataContext is MainWindowViewModel vm)) return;
+        if (DataContext is not MainWindowViewModel vm) return;
 
-        LoadPuzzleWindow dialog = new LoadPuzzleWindow();
+        LoadPuzzleWindow dialog = new();
         string? result = await dialog.ShowDialog<string?>(this);
         if (string.IsNullOrWhiteSpace(result)) return;
         

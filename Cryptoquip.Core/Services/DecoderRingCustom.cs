@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Cryptoquip.Services;
+﻿namespace Cryptoquip.Services;
 
 public class DecoderRingCustom : DecoderRingAbstract
 {

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using Cryptoquip.Extensions;
@@ -15,6 +12,11 @@ namespace Cryptoquip.ViewModels;
 
 public class SolverWindowViewModel : ViewModelBase
 {
+    private string Puzzle { get; } = string.Empty;
+    private bool EnableExclusionAnalysis { get; }
+    private DecoderRingAbstract Ring { get; } = new DecoderRingNull();
+    private WordList? Words { get; }
+    
     private string _logText = string.Empty;
     public string LogText
     {
@@ -26,12 +28,24 @@ public class SolverWindowViewModel : ViewModelBase
 
     public SolverWindowViewModel(string puzzle, bool enableExclusionAnalysis) : this()
     {
-        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>().Clone();
-        WordList wordList = Locator.Current.GetRequiredService<WordList>();
-        Solver solver = new Solver();
-        Task.Run(() => solver.RunSolver(LogMessage, ring, wordList, puzzle, enableExclusionAnalysis));
+        Puzzle = puzzle;
+        EnableExclusionAnalysis = enableExclusionAnalysis;
+        Ring = Locator.Current.GetRequiredService<DecoderRingAbstract>().Clone();
+        Words = Locator.Current.GetRequiredService<WordList>();
+        Task.Run(RunSolver);
     }
 
+    private void RunSolver()
+    {
+        Stopwatch watch = Stopwatch.StartNew();
+        Solver solver = new();
+        solver.Run(LogMessage, Ring, Words!, Puzzle, EnableExclusionAnalysis);
+        watch.Stop();
+        
+        LogMessage(string.Empty);
+        LogMessage($"Total run time: {watch.Elapsed.ReadableTime()}");
+    }
+    
     private void LogMessage(string message)
     {
         Dispatcher.UIThread.Post(() => LogText += message + Environment.NewLine);

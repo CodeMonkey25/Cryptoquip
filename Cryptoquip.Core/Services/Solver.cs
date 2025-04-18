@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.RegularExpressions;
-using Cryptoquip.Extensions;
+﻿using System.Text.RegularExpressions;
 using Cryptoquip.Models;
 
 namespace Cryptoquip.Services;
@@ -10,11 +8,9 @@ public class Solver
     private readonly List<string> _skipWords = new();
     private DecoderRingAbstract _partialSolution = new DecoderRingNull();
     
-    public void RunSolver(Action<string> logMessage, DecoderRingAbstract ring, WordList wordList, string puzzle,
+    public void Run(Action<string> logMessage, DecoderRingAbstract ring, WordList wordList, string puzzle,
         bool enableExclusionAnalysis)
     {
-        Stopwatch watch = Stopwatch.StartNew();
-
         logMessage($"Received puzzle: {puzzle}");
         logMessage(string.Empty);
         
@@ -88,10 +84,6 @@ public class Solver
         
         logMessage(string.Empty);
         logMessage(ring.Decode(puzzle));
-        watch.Stop();
-        
-        logMessage(string.Empty);
-        logMessage($"Total run time: {watch.Elapsed.ReadableTime()}");
     }
     
     private bool _solveLoop(DecoderRingAbstract ring, Word[] words, int depth)
@@ -134,5 +126,4 @@ public class Solver
 		
         return false;
     }
-
 }

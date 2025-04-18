@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Cryptoquip.Utility;
+﻿namespace Cryptoquip.Utility;
 
 public class ReadOnlyMemoryEqualityComparer<T> : IEqualityComparer<ReadOnlyMemory<T>> where T : notnull
 {

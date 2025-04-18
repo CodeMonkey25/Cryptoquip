@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Cryptoquip.Extensions;
 using Cryptoquip.Services;
-using Cryptoquip.Utility;
 using ReactiveUI;
 using Splat;
 
@@ -12,7 +11,7 @@ namespace Cryptoquip.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private ObservableCollection<WordViewModel> _words = new ObservableCollection<WordViewModel>();
+    private ObservableCollection<WordViewModel> _words = [];
     public ObservableCollection<WordViewModel> Words
     {
         get => _words;
@@ -20,9 +19,7 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public string OriginalMessage { get; private set; } = string.Empty;
-    
-    public MainWindowViewModel() { }
-    
+
     public void LoadPuzzle(string puzzle)
     {
         DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();

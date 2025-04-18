@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Cryptoquip.Models;
+﻿namespace Cryptoquip.Models;
 
 public class Word
 {
@@ -19,13 +16,17 @@ public class Word
 
     public static char[] MakePattern(string text)
     {
-        char[] patternMap = new char[26];
+        Span<char> patternMap = stackalloc char[26];
         int patternDepth = 0;
         char[] chars = new char[text.Length];
-        for (int i = 0; i < chars.Length; i++)
+        for (int i = 0; i < text.Length; i++)
         {
             char c = text[i];
-            if (!char.IsLetter(c)) continue;
+            if (!char.IsLetter(c))
+            {
+                chars[i] = c;
+                continue;
+            }
 
             int patternIndex = c - 'A';
             char match = patternMap[patternIndex];

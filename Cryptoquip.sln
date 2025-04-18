@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip.Desktop", "Crypt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip.Core", "Cryptoquip.Core\Cryptoquip.Core.csproj", "{69CBFD92-1030-4077-AC5C-C4738A92E15C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoquipConsole", "CryptoquipConsole\CryptoquipConsole.csproj", "{A8E7966B-7802-4CF7-B9E0-431515312743}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptoquip.Console", "Cryptoquip.Console\Cryptoquip.Console.csproj", "{A8E7966B-7802-4CF7-B9E0-431515312743}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
