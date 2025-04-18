@@ -20,8 +20,19 @@ public class Puzzle
         }
     }
 
-    public string[] GetWords()
+    public string[] GetAllWords()
     {
-        return Text.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+        return Text
+            .Split(" ", StringSplitOptions.RemoveEmptyEntries)
+            .Select(static w => w.Trim())
+            .ToArray();
+    }
+
+    public string[] GetFilteredAndDistinctWords()
+    {
+        return GetAllWords()
+            .Where(static w => w.All(static c => char.IsLetter(c) || c == '\''))
+            .Distinct()
+            .ToArray();
     }
 }

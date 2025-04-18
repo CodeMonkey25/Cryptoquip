@@ -19,11 +19,6 @@ public class WordList
             .ToDictionary(static g => g.Key, static g => g.ToArray(), comparer);
     }
 
-    public string[] GetMatches(Word word)
-    {
-        return _words.GetValueOrDefault(word.Pattern, []);
-    }
-
     public string[] GetMatches(Word word, DecoderRingAbstract ring)
     {
         return _words

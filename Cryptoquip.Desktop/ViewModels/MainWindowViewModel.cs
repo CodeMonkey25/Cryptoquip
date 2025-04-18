@@ -29,7 +29,7 @@ public class MainWindowViewModel : ViewModelBase
         
         Words.Clear();
         Dictionary<char, LetterViewModel> letterMap = new();
-        foreach (string word in Puzzle.GetWords())
+        foreach (string word in Puzzle.GetAllWords())
         {
             Words.Add(new WordViewModel(word, letterMap));
         }

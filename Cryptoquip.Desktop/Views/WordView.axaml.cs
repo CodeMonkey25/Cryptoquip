@@ -43,14 +43,14 @@ public partial class WordView : UserControl
         DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
         WordList words = Locator.Current.GetRequiredService<WordList>();
         string[] candidates = words.GetMatches(vm.Word, ring);
-        
+
         MenuFlyout flyout = new MenuFlyout()
         {
             ItemsSource = candidates
                 .Take(20)
                 .Prepend("-")
-                .Select(w=> new MenuItem { Header = w.ToString(), Command = vm.SolveWordCommand, CommandParameter = w })
-                .Prepend(new MenuItem { Header = $"{candidates.Length} matches", IsEnabled = false})
+                .Select(w => new MenuItem { Header = w.ToString(), Command = vm.SolveWordCommand, CommandParameter = w })
+                .Prepend(new MenuItem { Header = $"{candidates.Length} matches", IsEnabled = false })
                 .ToArray(),
             Placement = PlacementMode.Bottom
         };

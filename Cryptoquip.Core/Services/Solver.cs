@@ -14,12 +14,9 @@ public class Solver
         logMessage($"Received puzzle: {puzzle}");
         logMessage(string.Empty);
         
-        Word[] words = Regex.Replace(puzzle.Text, "[^A-Z0-9']", " ")
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries)
-            .Where(static w => w.Any(char.IsLetter))
-            .Where(static w => !w.Any(char.IsNumber))
+        Word[] words = puzzle
+            .GetFilteredAndDistinctWords()
             .Where(w => !_skipWords.Contains(w))
-            .Distinct()
             .Select(static w => new Word(w))
             .ToArray();
         logMessage($"Found {words.Length} unique words to solve.");
