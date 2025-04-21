@@ -1,4 +1,5 @@
 ﻿using Cryptoquip.Models;
+using Cryptoquip.Utility;
 
 namespace Cryptoquip.Services;
 
@@ -7,7 +8,7 @@ public class Solver
     private readonly List<string> _skipWords = new();
     private DecoderRingAbstract _partialSolution = new DecoderRingNull();
     
-    public void Run(Action<string> logMessage, DecoderRingAbstract ring, WordList wordList, Puzzle puzzle,
+    public void Run(Action<string> logMessage, DecoderRingAbstract ring, WordList? wordList, Puzzle puzzle,
         bool enableExclusionAnalysis)
     {
         logMessage($"Received puzzle: {puzzle}");
@@ -19,6 +20,13 @@ public class Solver
             .Select(static w => new Word(w))
             .ToArray();
         logMessage($"Found {words.Length} unique words to solve.");
+
+        if (wordList == null)
+        {
+            IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
+            logMessage("No word list provided. Loading word list from disk.");
+            wordList = new WordList(words.Select(static w => w.Pattern).ToHashSet(comparer));
+        }
         
         logMessage("Loading matches...");
         foreach (Word word in words)

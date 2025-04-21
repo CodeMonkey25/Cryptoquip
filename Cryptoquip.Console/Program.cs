@@ -15,7 +15,7 @@ class Program
         
         DecoderRingAbstract ring = new DecoderRingCustom();
         Puzzle puzzle = new(text, ring);
-        WordList wordList = new();
+        WordList? wordList = null;
         Solver solver = new();
         solver.Run(LogMessage, ring, wordList, puzzle, false);
         watch.Stop();

@@ -8,15 +8,17 @@ public class WordList
     private const string DictionaryFileName = @"dictionary.txt";
     private readonly Dictionary<char[],string[]> _words;
 
-    public WordList()
+    public WordList(HashSet<char[]>? patterns = null)
     {
         IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
         
-        _words = File.ReadAllLines(DictionaryFileName)
-            // .AsParallel()
-            // .WithMergeOptions(ParallelMergeOptions.NotBuffered)
-            .GroupBy(Word.MakePattern, comparer)
-            .ToDictionary(static g => g.Key, static g => g.ToArray(), comparer);
+        _words = File.ReadLines(DictionaryFileName)
+            .AsParallel()
+            // .WithMergeOptions(ParallelMergeOptions.NotBuffered) // this makes the words not in alphabetic order
+            .Select(static w => new { Word = w, Pattern = Word.MakePattern(w)})
+            .Where(w => patterns == null || patterns.Contains(w.Pattern))
+            .GroupBy(static w => w.Pattern, comparer)
+            .ToDictionary(static g => g.Key, static g => g.Select(w => w.Word).ToArray(), comparer);
     }
 
     public string[] GetMatches(Word word, DecoderRingAbstract ring)

@@ -43,7 +43,6 @@ public abstract class DecoderRingAbstract
             if (parts.Length != 2) continue;
             if (parts[0].Length != parts[1].Length) continue;
 
-            // foreach ((char c1, char c2) in parts[0].Zip(parts[1]))
             for(int i = 0; i < parts[0].Length; i++)
             {
                 char c1 = parts[0].Span[i];
