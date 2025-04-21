@@ -67,7 +67,7 @@ public class DecoderRingCustom : DecoderRingAbstract
         DecoderRingCustom that = new()
         {
             _cypher = this._cypher.ToArray(),
-            _hints = this._hints.ToHashSet()
+            Hints = this.Hints.ToHashSet()
         };
         return that;
     }

@@ -2,7 +2,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Cryptoquip.Models;
 using Cryptoquip.Utility;
 using Cryptoquip.ViewModels;
 using ReactiveUI;
@@ -70,12 +69,13 @@ public partial class MainWindow : Window
     private async Task RunSolver()
     {
         if (!(DataContext is MainWindowViewModel mainWindowViewModel)) return;
+        if (mainWindowViewModel.Puzzle == null) return;
 
         SolverWindowViewModel solverWindowViewModel = new(mainWindowViewModel.Puzzle, EnableExclusionAnalysis);
-        SolverWindow dialog = new SolverWindow() { DataContext = solverWindowViewModel};
+        SolverWindow dialog = new() { DataContext = solverWindowViewModel };
         string? result = await dialog.ShowDialog<string?>(this);
         if (string.IsNullOrWhiteSpace(result)) return;
-        
+
         // vm.LoadPuzzle(result);
     }
 }

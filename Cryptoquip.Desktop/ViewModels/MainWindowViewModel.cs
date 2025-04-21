@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using Cryptoquip.Extensions;
 using Cryptoquip.Models;
 using Cryptoquip.Services;

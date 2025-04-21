@@ -49,7 +49,7 @@ public class DecoderRingDictionary : DecoderRingAbstract
         DecoderRingDictionary that = new()
         {
             _map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value),
-            _hints = this._hints.ToHashSet()
+            Hints = this.Hints.ToHashSet()
         };
         return that;
     }

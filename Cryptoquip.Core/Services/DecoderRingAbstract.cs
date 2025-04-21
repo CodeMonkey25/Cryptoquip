@@ -2,7 +2,7 @@
 
 public abstract class DecoderRingAbstract
 {
-    protected HashSet<char> _hints = [];
+    protected HashSet<char> Hints = [];
     
     public abstract int SolveCount { get; }
     public abstract void Put(char letter, char match);
@@ -46,7 +46,7 @@ public abstract class DecoderRingAbstract
                 if (!char.IsLetter(c1)) continue;
                 if (!char.IsLetter(c2)) continue;
                 Put(c1, c2);
-                _hints.Add(c1);
+                Hints.Add(c1);
             }
         }
     }
@@ -59,7 +59,7 @@ public abstract class DecoderRingAbstract
 
     public virtual void Clear()
     {
-        _hints.Clear();
+        Hints.Clear();
     }
 
     public abstract IEnumerable<char> GetUsedLetters();
@@ -74,7 +74,7 @@ public abstract class DecoderRingAbstract
     
     public virtual bool WasSetFromHint(char letter)
     {
-        return _hints.Contains(letter);
+        return Hints.Contains(letter);
     }
     
     public abstract DecoderRingAbstract Clone();
