@@ -44,7 +44,7 @@ public partial class WordView : UserControl
         WordList words = Locator.Current.GetRequiredService<WordList>();
         string[] candidates = words.GetMatches(vm.Word, ring);
 
-        MenuFlyout flyout = new MenuFlyout()
+        MenuFlyout flyout = new()
         {
             ItemsSource = candidates
                 .Take(20)

@@ -36,7 +36,7 @@ public class WordViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _solveWordCommand, value);
     }
 
-    public Word Word { get; set; } = new Word("");
+    public Word Word { get; set; } = new("");
 
     public WordViewModel()
     {
@@ -74,7 +74,6 @@ public class WordViewModel : ViewModelBase
             if (ring.Contains(l)) continue;
             ring.Put(l, m);
             Letters.First(lvm => lvm.Letter == l).Update();
-            // Letters.First(lvm => lvm.Letter == l).RaisePropertyChanged(nameof(LetterViewModel.DecodedLetter));
         }
         
         return Unit.Default;

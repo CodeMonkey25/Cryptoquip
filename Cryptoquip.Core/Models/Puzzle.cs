@@ -1,30 +1,38 @@
-﻿using Cryptoquip.Services;
+﻿using Cryptoquip.Extensions;
+using Cryptoquip.Services;
 
 namespace Cryptoquip.Models;
 
 public class Puzzle
 {
     public string OriginalText { get; }
-    public string Text { get; set; }
+    public ReadOnlyMemory<char> Text { get; set; }
 
     public Puzzle(string text, DecoderRingAbstract ring)
     {
         OriginalText = text;
         ring.Clear();
         
-        string[] input = text.ToUpper().Split("<HINT>:");
-        Text = input.First();
-        if (input.Length >= 2)
+        int i = text.IndexOf("<HINT>:", StringComparison.Ordinal);
+        if (i < 0)
         {
-            ring.LoadHints(input[1]);
+            Text = text.AsMemory();
+        }
+        else
+        {
+            Text = text.AsMemory(0, i);
+            ReadOnlyMemory<char> hint = text.AsMemory(i + 7, text.Length - i - 7);
+            ring.LoadHints(hint);
         }
     }
 
     public string[] GetAllWords()
     {
         return Text
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries)
+            .Split(' ')
             .Select(static w => w.Trim())
+            .Select(static w => new string(w.Span))
+            .Where(w => !string.IsNullOrEmpty(w))
             .ToArray();
     }
 

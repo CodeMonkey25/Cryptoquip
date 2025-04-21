@@ -1,4 +1,6 @@
-﻿namespace Cryptoquip.Services;
+﻿using Cryptoquip.Extensions;
+
+namespace Cryptoquip.Services;
 
 public abstract class DecoderRingAbstract
 {
@@ -33,16 +35,19 @@ public abstract class DecoderRingAbstract
         return true;
     }
 
-    public virtual void LoadHints(string hints)
+    public virtual void LoadHints(ReadOnlyMemory<char> hints)
     {
-        foreach (string hint in hints.Split(",").Select(static h => h.Trim()))
+        foreach (ReadOnlyMemory<char> hint in hints.Split(',').Select(static h => h.Trim()))
         {
-            string[] parts = hint.Split("=").Select(static h => h.Trim()).ToArray();
+            ReadOnlyMemory<char>[] parts = hint.Split('=').Select(static h => h.Trim()).ToArray();
             if (parts.Length != 2) continue;
             if (parts[0].Length != parts[1].Length) continue;
 
-            foreach ((char c1, char c2) in parts[0].Zip(parts[1]))
+            // foreach ((char c1, char c2) in parts[0].Zip(parts[1]))
+            for(int i = 0; i < parts[0].Length; i++)
             {
+                char c1 = parts[0].Span[i];
+                char c2 = parts[1].Span[i];
                 if (!char.IsLetter(c1)) continue;
                 if (!char.IsLetter(c2)) continue;
                 Put(c1, c2);
@@ -51,7 +56,7 @@ public abstract class DecoderRingAbstract
         }
     }
 
-    public virtual string Decode(string message) => string.Concat(message.Select(Get));
+    public virtual string Decode(ReadOnlyMemory<char> message) => string.Concat(message.Select(Get));
     
     public abstract void Remove(char letter);
     public abstract bool Contains(char letter);
