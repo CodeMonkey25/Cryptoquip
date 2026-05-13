@@ -1,8 +1,8 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
 using System;
 using Cryptoquip.Models;
 using Cryptoquip.Services;
+using ReactiveUI.Avalonia;
 using Splat;
 
 namespace Cryptoquip;
@@ -25,7 +25,7 @@ sealed class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
-            .UseReactiveUI();
+            .UseReactiveUI(_ => { });
 
     private static void RegisterDependencies()
     {
