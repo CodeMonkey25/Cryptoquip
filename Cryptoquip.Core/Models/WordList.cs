@@ -6,19 +6,34 @@ namespace Cryptoquip.Models;
 public class WordList
 {
     private const string DictionaryFileName = @"dictionary.txt";
-    private readonly Dictionary<char[],string[]> _words;
+    private readonly Dictionary<char[],List<string>> _words = new(new ArrayEqualityComparer<char>());
 
     public WordList(HashSet<char[]>? patterns = null)
     {
-        IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
-        
-        _words = File.ReadLines(DictionaryFileName)
-            .AsParallel()
-            // .WithMergeOptions(ParallelMergeOptions.NotBuffered) // this makes the words not in alphabetic order
-            .Select(static w => new { Word = w, Pattern = Word.MakePattern(w)})
-            .Where(w => patterns == null || patterns.Contains(w.Pattern))
-            .GroupBy(static w => w.Pattern, comparer)
-            .ToDictionary(static g => g.Key, static g => g.Select(w => w.Word).ToArray(), comparer);
+        Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
+        {
+            char[] pattern = Word.MakePattern(word);
+            if (patterns == null || patterns.Contains(pattern))
+            {
+                lock(_words)
+                {
+                    if (!_words.TryGetValue(pattern, out List<string>? list))
+                    {
+                        _words[pattern] = list = [];
+                    }
+                    list.Add(word);
+                }
+            }
+        });
+
+        // IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
+        // _words = File.ReadLines(DictionaryFileName)
+        //     .AsParallel()
+        //     // .WithMergeOptions(ParallelMergeOptions.NotBuffered) // this makes the words not in alphabetic order
+        //     .Select(static w => new { Word = w, Pattern = Word.MakePattern(w)})
+        //     .Where(w => patterns == null || patterns.Contains(w.Pattern))
+        //     .GroupBy(static w => w.Pattern, comparer)
+        //     .ToDictionary(static g => g.Key, static g => g.Select(w => w.Word).ToArray(), comparer);
     }
 
     public string[] GetMatches(Word word, DecoderRingAbstract ring)
