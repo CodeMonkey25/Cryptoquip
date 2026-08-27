@@ -3,7 +3,9 @@
 public class DecoderRingCustom : DecoderRingAbstract
 {
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
-    public override int SolveCount => _cypher.Length - _cypher.Count(static c => c != '-');
+    private HashSet<char> _usedLetters = new();
+
+    public override int SolveCount => _usedLetters.Count;
 
     public override void Put(char letter, char match)
     {
@@ -11,6 +13,7 @@ public class DecoderRingCustom : DecoderRingAbstract
         {
             int i = letter - 'A';
             _cypher[i] = match;
+            _usedLetters.Add(match);
         }
     }
 
@@ -30,6 +33,7 @@ public class DecoderRingCustom : DecoderRingAbstract
         if (char.IsLetter(letter))
         {
             int i = letter - 'A';
+            _usedLetters.Remove(_cypher[i]);
             _cypher[i] = '-';
         }
     }
@@ -47,18 +51,19 @@ public class DecoderRingCustom : DecoderRingAbstract
 
     public override IEnumerable<char> GetUsedLetters()
     {
-        return _cypher.Where(static c => c != '-').ToHashSet();
+        return _usedLetters;
     }
     
     public override bool UsedContains(char letter)
     {
-        return _cypher.Contains(letter);
+        return _usedLetters.Contains(letter);
     }
     
     public override void Clear()
     {
         for (int i = 0; i < _cypher.Length; i++)
             _cypher[i] = '-';
+        _usedLetters.Clear();
         base.Clear();
     }
 
@@ -67,7 +72,8 @@ public class DecoderRingCustom : DecoderRingAbstract
         DecoderRingCustom that = new()
         {
             _cypher = this._cypher.ToArray(),
-            Hints = this.Hints.ToHashSet()
+            Hints = this.Hints.ToHashSet(),
+            _usedLetters = this._usedLetters.ToHashSet(),
         };
         return that;
     }
