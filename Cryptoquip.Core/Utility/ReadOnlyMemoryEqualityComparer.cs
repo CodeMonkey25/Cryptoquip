@@ -1,33 +1,23 @@
 ﻿namespace Cryptoquip.Utility;
 
-public class ReadOnlyMemoryEqualityComparer<T> : IEqualityComparer<ReadOnlyMemory<T>> where T : notnull
+public sealed class ReadOnlyMemoryEqualityComparer<T> : IEqualityComparer<ReadOnlyMemory<T>> 
+    where T : IEquatable<T>
 {
-    private static readonly EqualityComparer<T> ElementComparer = EqualityComparer<T>.Default;
+    public static readonly ReadOnlyMemoryEqualityComparer<T> Instance = new();
 
     public bool Equals(ReadOnlyMemory<T> first, ReadOnlyMemory<T> second)
     {
-        if (first.Length != second.Length) return false;
-            
-        for (int i = 0; i < first.Length; i++)
-        {
-            if (!ElementComparer.Equals(first.Span[i], second.Span[i]))
-            {
-                return false;
-            }
-        }
-        return true;
+        return first.Span.SequenceEqual(second.Span);
     }
 
-    public int GetHashCode(ReadOnlyMemory<T> array)
+    public int GetHashCode(ReadOnlyMemory<T> memory)
     {
-        unchecked
+        ReadOnlySpan<T> span = memory.Span;
+        HashCode hash = new();
+        foreach (ref readonly T item in span)
         {
-            int hash = 17;
-            foreach (T element in array.Span)
-            {
-                hash = hash * 31 + ElementComparer.GetHashCode(element);
-            }
-            return hash;
+            hash.Add(item);
         }
+        return hash.ToHashCode();
     }
 }
