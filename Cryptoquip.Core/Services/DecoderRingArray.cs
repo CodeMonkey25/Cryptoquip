@@ -1,11 +1,11 @@
 ﻿namespace Cryptoquip.Services;
 
-public class DecoderRingCustom : DecoderRingAbstract
+public class DecoderRingArray : DecoderRingAbstract
 {
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
-    private HashSet<char> _usedLetters = new();
+    private bool[] _usedLetters = new bool[26];
 
-    public override int SolveCount => _usedLetters.Count;
+    public override int SolveCount => _usedLetters.Count(b => b);
 
     public override void Put(char letter, char match)
     {
@@ -13,7 +13,9 @@ public class DecoderRingCustom : DecoderRingAbstract
         {
             int i = letter - 'A';
             _cypher[i] = match;
-            _usedLetters.Add(match);
+            
+            i = match - 'A';
+            _usedLetters[i] = true;
         }
     }
 
@@ -33,8 +35,10 @@ public class DecoderRingCustom : DecoderRingAbstract
         if (char.IsLetter(letter))
         {
             int i = letter - 'A';
-            _usedLetters.Remove(_cypher[i]);
+            char match = _cypher[i];
             _cypher[i] = '-';
+            i = match - 'A';
+            _usedLetters[i] = false;
         }
     }
 
@@ -51,29 +55,33 @@ public class DecoderRingCustom : DecoderRingAbstract
 
     public override IEnumerable<char> GetUsedLetters()
     {
-        return _usedLetters;
+        for (int i = 0; i < _usedLetters.Length; i++)
+        {
+            if (_usedLetters[i])
+                yield return (char)('A' + i);
+        }
     }
     
     public override bool UsedContains(char letter)
     {
-        return _usedLetters.Contains(letter);
+        return _usedLetters[letter - 'A'];
     }
     
     public override void Clear()
     {
         for (int i = 0; i < _cypher.Length; i++)
             _cypher[i] = '-';
-        _usedLetters.Clear();
+        Array.Clear(_usedLetters);
         base.Clear();
     }
 
     public override DecoderRingAbstract Clone()
     {
-        DecoderRingCustom that = new()
+        DecoderRingArray that = new()
         {
             _cypher = this._cypher.ToArray(),
             Hints = this.Hints.ToHashSet(),
-            _usedLetters = this._usedLetters.ToHashSet(),
+            _usedLetters = this._usedLetters.ToArray(),
         };
         return that;
     }
