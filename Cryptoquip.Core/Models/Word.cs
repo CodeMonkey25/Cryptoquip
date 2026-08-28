@@ -4,7 +4,7 @@ public class Word
 {
     public string Text { get; }
     public char[] Pattern { get; }
-    public IEnumerable<string> Matches { get; set; }
+    public IReadOnlyList<string> Matches { get; set; }
     public bool IsSolvable => Text.Any(char.IsLetter) && !Text.Any(char.IsWhiteSpace);
     
     public Word(string text)

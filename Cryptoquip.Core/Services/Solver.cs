@@ -33,11 +33,11 @@ public class Solver
         {
             word.Matches = wordList.GetMatches(word, ring);
         }
-        words = words.OrderBy(static w => w.Matches.Count()).ThenByDescending(static w => w.Text.Length).ToArray();
+        words = words.OrderBy(static w => w.Matches.Count).ThenByDescending(static w => w.Text.Length).ToArray();
         
         foreach (Word word in words)
         {
-            logMessage("\t" + word.Text + " (" + word.Matches.Count() + ")");
+            logMessage("\t" + word.Text + " (" + word.Matches.Count + ")");
         }
         logMessage($"Word matches are ready.");
         
@@ -57,24 +57,24 @@ public class Solver
                     foreach (Word otherWord in words)
                     {
                         if(word == otherWord) continue;
-                        deleted += otherWord.Matches.Count();
+                        deleted += otherWord.Matches.Count;
                         otherWord.EnsureMatchRequirements(requirements);
-                        deleted -= otherWord.Matches.Count();
+                        deleted -= otherWord.Matches.Count;
                     }
                 }
                 logMessage("\tDeleted " + deleted + " words...");
             }
             logMessage(string.Empty);
 			
-            words = words.OrderBy(static w => w.Matches.Count()).ThenByDescending(static w => w.Text.Length).ToArray();
+            words = words.OrderBy(static w => w.Matches.Count).ThenByDescending(static w => w.Text.Length).ToArray();
             foreach (Word word in words)
             {
-                logMessage("\t" + word.Text + " (" + word.Matches.Count() + ")");
+                logMessage("\t" + word.Text + " (" + word.Matches.Count + ")");
             }
         }
         
         int startIndex = 0;
-        while (startIndex < words.Length && words[startIndex].Matches.Count() == 0)
+        while (startIndex < words.Length && words[startIndex].Matches.Count == 0)
         {
             logMessage($"The word '{words[startIndex].Text}' is unsolvable - skipping this word");
             startIndex++;
