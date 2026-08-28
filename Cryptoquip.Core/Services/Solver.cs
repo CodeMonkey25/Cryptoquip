@@ -23,9 +23,8 @@ public class Solver
 
         if (wordList == null)
         {
-            IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
             logMessage("No word list provided. Loading word list from disk.");
-            wordList = new WordList(words.Select(static w => w.Pattern).ToHashSet(comparer));
+            wordList = new WordList(words.Select(static w => w.Pattern).ToHashSet());
         }
         
         logMessage("Loading matches...");

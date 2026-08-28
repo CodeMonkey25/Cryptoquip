@@ -3,7 +3,7 @@
 public class Word
 {
     public string Text { get; }
-    public char[] Pattern { get; }
+    public string Pattern { get; }
     public List<string> Matches { get; set; }
     public bool IsSolvable => Text.Any(char.IsLetter) && !Text.Any(char.IsWhiteSpace);
     
@@ -14,7 +14,7 @@ public class Word
         Matches = [];
     }
 
-    public static char[] MakePattern(string text)
+    public static string MakePattern(string text)
     {
         Span<char> patternMap = stackalloc char[26];
         int patternDepth = 0;
@@ -40,7 +40,7 @@ public class Word
             patternMap[patternIndex] = match;
             chars[i] = match;
         }
-        return chars;
+        return new string(chars);
     }
 
     public MatchRequirements GetMatchRequirements()

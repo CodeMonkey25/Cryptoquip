@@ -6,13 +6,13 @@ namespace Cryptoquip.Models;
 public class WordList
 {
     private const string DictionaryFileName = @"dictionary.txt";
-    private readonly Dictionary<char[],List<string>> _words = new(new ArrayEqualityComparer<char>());
+    private readonly Dictionary<string,List<string>> _words = new();
 
-    public WordList(HashSet<char[]>? patterns = null)
+    public WordList(HashSet<string>? patterns = null)
     {
         Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
         {
-            char[] pattern = Word.MakePattern(word);
+            string pattern = Word.MakePattern(word);
             if (patterns == null || patterns.Contains(pattern))
             {
                 lock(_words)
@@ -26,6 +26,19 @@ public class WordList
             }
         });
 
+        // foreach (string word in File.ReadLines(WordList.DictionaryFileName))
+        // {
+        //     string pattern = Word.MakePattern(word);
+        //     if (patterns == null || patterns.Contains(pattern))
+        //     {
+        //         if (!_words.TryGetValue(pattern, out List<string>? list))
+        //         {
+        //             _words[pattern] = list = [];
+        //         }
+        //         list.Add(word);
+        //     }
+        // }
+        
         // IEqualityComparer<char[]> comparer = new ArrayEqualityComparer<char>();
         // _words = File.ReadLines(DictionaryFileName)
         //     .AsParallel()
