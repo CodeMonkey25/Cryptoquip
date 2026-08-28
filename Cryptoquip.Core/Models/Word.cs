@@ -4,7 +4,7 @@ public class Word
 {
     public string Text { get; }
     public char[] Pattern { get; }
-    public string[] Matches { get; set; }
+    public IEnumerable<string> Matches { get; set; }
     public bool IsSolvable => Text.Any(char.IsLetter) && !Text.Any(char.IsWhiteSpace);
     
     public Word(string text)
@@ -43,45 +43,21 @@ public class Word
         return chars;
     }
 
-    public Dictionary<char, HashSet<char>> GetMatchRequirements()
+    public MatchRequirements GetMatchRequirements()
     {
-        Dictionary<char, HashSet<char>> map = new();
+        return MatchRequirements.Build(Text, Matches);
+    }
+
+    public void EnsureMatchRequirements(MatchRequirements requirements)
+    {
+        List<string> matches = [];
         foreach (string match in Matches)
         {
-            for (int i = 0; i < match.Length; i++)
+            if (requirements.Matches(Text, match))
             {
-                char l = Text[i];
-                char m = match[i];
-                if (map.TryGetValue(l, out HashSet<char>? set))
-                {
-                    set.Add(m);
-                }
-                else
-                {
-                    map[l] = [m];
-                }
+                matches.Add(match);
             }
         }
-        return map;
-    }
-
-    public void EnsureMatchRequirements(IReadOnlyDictionary<char, HashSet<char>> required)
-    {
-        Matches = Matches.Where(m => MatchesRequirements(m, required)).ToArray();
-    }
-    
-    private bool MatchesRequirements(string match, IReadOnlyDictionary<char, HashSet<char>> required)
-    {
-        for (int i = 0; i < match.Length; i++)
-        {
-            char l = Text[i];
-            if (!required.TryGetValue(l, out HashSet<char>? set)) continue;
-
-            char m = match[i];
-            if (set.Contains(m)) continue;
-            
-            return false;
-        }
-        return true;
+        Matches = matches;
     }
 }

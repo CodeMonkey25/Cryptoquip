@@ -33,11 +33,11 @@ public class Solver
         {
             word.Matches = wordList.GetMatches(word, ring);
         }
-        words = words.OrderBy(static w => w.Matches.Length).ThenByDescending(static w => w.Text.Length).ToArray();
+        words = words.OrderBy(static w => w.Matches.Count()).ThenByDescending(static w => w.Text.Length).ToArray();
         
         foreach (Word word in words)
         {
-            logMessage("\t" + word.Text + " (" + word.Matches.Length + ")");
+            logMessage("\t" + word.Text + " (" + word.Matches.Count() + ")");
         }
         logMessage($"Word matches are ready.");
         
@@ -52,29 +52,29 @@ public class Solver
                 deleted = 0;
                 foreach (Word word in words)
                 {
-                    Dictionary<char, HashSet<char>> required = word.GetMatchRequirements();
-                    if(required.Count == 0) continue;
+                    MatchRequirements requirements = word.GetMatchRequirements();
+                    if (requirements.Count == 0) continue;
                     foreach (Word otherWord in words)
                     {
                         if(word == otherWord) continue;
-                        deleted += otherWord.Matches.Length;
-                        otherWord.EnsureMatchRequirements(required);
-                        deleted -= otherWord.Matches.Length;
+                        deleted += otherWord.Matches.Count();
+                        otherWord.EnsureMatchRequirements(requirements);
+                        deleted -= otherWord.Matches.Count();
                     }
                 }
                 logMessage("\tDeleted " + deleted + " words...");
             }
             logMessage(string.Empty);
 			
-            words = words.OrderBy(static w => w.Matches.Length).ThenByDescending(static w => w.Text.Length).ToArray();
+            words = words.OrderBy(static w => w.Matches.Count()).ThenByDescending(static w => w.Text.Length).ToArray();
             foreach (Word word in words)
             {
-                logMessage("\t" + word.Text + " (" + word.Matches.Length + ")");
+                logMessage("\t" + word.Text + " (" + word.Matches.Count() + ")");
             }
         }
         
         int startIndex = 0;
-        while (startIndex < words.Length && words[startIndex].Matches.Length == 0)
+        while (startIndex < words.Length && words[startIndex].Matches.Count() == 0)
         {
             logMessage($"The word '{words[startIndex].Text}' is unsolvable - skipping this word");
             startIndex++;
