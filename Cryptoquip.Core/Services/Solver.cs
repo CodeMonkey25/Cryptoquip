@@ -102,10 +102,10 @@ public class Solver
 		
         Word word = words[depth];
         string[] possibleMatches = word.Matches.Where(w => ring.Matches(word.Text, w)).ToArray();
+        bool[] candidates = new bool[26];
         foreach(string possibleMatch in possibleMatches)
         {
             // add candidate letter matches
-            HashSet<char> candidates = [];
             for (int i = 0; i < word.Text.Length; i++)
             {
                 char l = word.Text[i];
@@ -114,7 +114,7 @@ public class Solver
 
                 char m = possibleMatch[i];
                 ring.Put(l, m);
-                candidates.Add(l);
+                candidates[l - 'A'] = true;
             }
 
             // recurse, returning if the puzzle is solved...
@@ -122,9 +122,13 @@ public class Solver
                 return true;
 
             // remove candidate letter matches
-            foreach(char candidate in candidates)
+            for (int i = 0; i < candidates.Length; i++)
             {
-                ring.Remove(candidate);
+                if (candidates[i])
+                {
+                    ring.Remove((char)('A' + i));
+                    candidates[i] = false;
+                }
             }
         }
 		
