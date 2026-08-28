@@ -101,10 +101,11 @@ public class Solver
         }
 		
         Word word = words[depth];
-        string[] possibleMatches = word.Matches.Where(w => ring.Matches(word.Text, w)).ToArray();
         bool[] candidates = new bool[26];
-        foreach(string possibleMatch in possibleMatches)
+        foreach(string possibleMatch in word.Matches)
         {
+            if (!ring.Matches(word.Text, possibleMatch)) continue;
+            
             // add candidate letter matches
             for (int i = 0; i < word.Text.Length; i++)
             {
