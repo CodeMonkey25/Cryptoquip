@@ -36,11 +36,11 @@ public class WordList
         //     .ToDictionary(static g => g.Key, static g => g.Select(w => w.Word).ToArray(), comparer);
     }
 
-    public string[] GetMatches(Word word, DecoderRingAbstract ring)
+    public List<string> GetMatches(Word word, DecoderRingAbstract ring)
     {
         return _words
             .GetValueOrDefault(word.Pattern, [])
             .Where(w => ring.Matches(word.Text, w))
-            .ToArray();
+            .ToList();
     }
 }

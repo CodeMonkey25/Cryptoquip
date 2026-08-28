@@ -4,7 +4,7 @@ public class Word
 {
     public string Text { get; }
     public char[] Pattern { get; }
-    public IReadOnlyList<string> Matches { get; set; }
+    public List<string> Matches { get; set; }
     public bool IsSolvable => Text.Any(char.IsLetter) && !Text.Any(char.IsWhiteSpace);
     
     public Word(string text)
@@ -50,14 +50,16 @@ public class Word
 
     public void EnsureMatchRequirements(MatchRequirements requirements)
     {
-        List<string> matches = [];
-        foreach (string match in Matches)
-        {
-            if (requirements.Matches(Text, match))
-            {
-                matches.Add(match);
-            }
-        }
-        Matches = matches;
+        Matches.RemoveAll(match => !requirements.Matches(Text, match));
+        
+        // List<string> matches = [];
+        // foreach (string match in Matches)
+        // {
+        //     if (requirements.Matches(Text, match))
+        //     {
+        //         matches.Add(match);
+        //     }
+        // }
+        // Matches = matches;
     }
 }
