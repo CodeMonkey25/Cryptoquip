@@ -23,7 +23,7 @@ public static class ReadOnlyMemoryExtensions
     {
         foreach(char c in source.Span)
         {
-            if (!predicate(c))
+            if (predicate(c))
                 return true;
         }
         return false;

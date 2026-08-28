@@ -100,7 +100,7 @@ public class Solver
         }
 		
         Word word = words[depth];
-        bool[] candidates = new bool[26];
+        Span<bool> candidates = stackalloc bool[26];
         foreach(string possibleMatch in word.Matches)
         {
             if (!ring.Matches(word.Text, possibleMatch)) continue;

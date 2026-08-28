@@ -30,7 +30,7 @@ public class DecoderRingDictionary : DecoderRingAbstract
 
     public override IEnumerable<char> GetUsedLetters()
     {
-        return _map.Keys;
+        return _map.Values;
     }
     
     public override bool UsedContains(char letter)
