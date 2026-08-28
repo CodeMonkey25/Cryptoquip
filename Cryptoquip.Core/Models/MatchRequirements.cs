@@ -8,7 +8,7 @@ public abstract class MatchRequirements
    
     public static MatchRequirements Build(string text, IEnumerable<string> matches)
     {
-        MatchRequirements requirements = new MatchRequirementsDictionary();
+        MatchRequirements requirements = new MatchRequirementsArray();
         foreach (string match in matches)
         {
             requirements.RegisterMatch(text, match);
