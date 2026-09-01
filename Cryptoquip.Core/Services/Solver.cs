@@ -79,7 +79,7 @@ public class Solver
             startIndex++;
         }
 
-        if (!_solveLoop(ref ring, words, startIndex))
+        if (!_solveLoop(ring, words, startIndex))
         {
             logMessage("Could not find a solution. Printing the best attempt.");
             ring.Overwrite(_partialSolution);
@@ -89,7 +89,7 @@ public class Solver
         logMessage(ring.Decode(puzzle.Text));
     }
     
-    private bool _solveLoop(ref DecoderRing ring, Word[] words, int depth)
+    private bool _solveLoop(DecoderRing ring, Word[] words, int depth)
     {
         // depth exceeds the length of the array, we must have solved it...
         if (depth >= words.Length) return true;
@@ -120,7 +120,7 @@ public class Solver
             }
 
             // recurse, returning if the puzzle is solved...
-            if (_solveLoop(ref ring, words, depth + 1))
+            if (_solveLoop(ring, words, depth + 1))
                 return true;
 
             // remove candidate letter matches
