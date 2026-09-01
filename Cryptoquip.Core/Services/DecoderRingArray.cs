@@ -85,13 +85,12 @@ public class DecoderRingArray : DecoderRing
 
     public override DecoderRing Clone()
     {
-        DecoderRingArray that = new()
+        return new DecoderRingArray()
         {
             _cypher = this._cypher.ToArray(),
             Hints = this.Hints.ToHashSet(),
             _usedLetters = this._usedLetters.ToArray(),
-            _solveCount = 0,
+            _solveCount = this._solveCount,
         };
-        return that;
     }
 }

@@ -7,7 +7,7 @@ public class DecoderRingDictionary : DecoderRing
 
     public override void Put(char letter, char match)
     {
-        if (char.IsLetter(letter))
+        if (char.IsAsciiLetterUpper(letter))
         {
             _map[letter] = match;
         }
@@ -15,7 +15,7 @@ public class DecoderRingDictionary : DecoderRing
 	
     public override char Get(char letter)
     {
-        return !char.IsLetter(letter) ? letter : _map.GetValueOrDefault(letter, '-');
+        return !char.IsAsciiLetterUpper(letter) ? letter : _map.GetValueOrDefault(letter, '-');
     }
 
     public override void Remove(char letter)
@@ -46,11 +46,10 @@ public class DecoderRingDictionary : DecoderRing
 
     public override DecoderRing Clone()
     {
-        DecoderRingDictionary that = new()
+        return new DecoderRingDictionary
         {
             _map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value),
             Hints = this.Hints.ToHashSet()
         };
-        return that;
     }
 }
