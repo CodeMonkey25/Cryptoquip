@@ -52,15 +52,5 @@ public class Word
     public void EnsureMatchRequirements(MatchRequirements requirements)
     {
         Matches.RemoveAll(match => !requirements.Matches(Text, match));
-        
-        // List<string> matches = [];
-        // foreach (string match in Matches)
-        // {
-        //     if (requirements.Matches(Text, match))
-        //     {
-        //         matches.Add(match);
-        //     }
-        // }
-        // Matches = matches;
     }
 }
