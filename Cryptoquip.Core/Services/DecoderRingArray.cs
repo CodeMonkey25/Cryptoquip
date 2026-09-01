@@ -5,7 +5,18 @@ public class DecoderRingArray : DecoderRingAbstract
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
     private bool[] _usedLetters = new bool[26];
 
-    public override int SolveCount => _usedLetters.Count(b => b);
+    public override int SolveCount
+    {
+        get
+        {
+            int count = 0;
+            foreach (bool b in _usedLetters)
+            {
+                if (b) count++;
+            }
+            return count;
+        }
+    }
 
     public override void Put(char letter, char match)
     {
