@@ -76,8 +76,7 @@ public class DecoderRingArray : DecoderRing
     
     public override void Clear()
     {
-        for (int i = 0; i < _cypher.Length; i++)
-            _cypher[i] = '-';
+        Array.Fill(_cypher, '-');
         Array.Clear(_usedLetters);
         _solveCount = 0;
         base.Clear();
