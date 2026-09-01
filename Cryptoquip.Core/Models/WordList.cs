@@ -8,20 +8,44 @@ public class WordList
     private const string DictionaryFileName = @"dictionary.txt";
     private readonly Dictionary<string,List<string>> _words = new();
 
-    public WordList(HashSet<string>? patterns = null)
+    public WordList()
     {
         Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
         {
             string pattern = Word.MakePattern(word);
-            if (patterns == null || patterns.Contains(pattern))
+            lock(_words)
+            {
+                if (_words.TryGetValue(pattern, out List<string>? list))
+                {
+                    list.Add(word);
+                }
+                else
+                {
+                    _words.Add(pattern, [word,]);
+                }
+            }
+        });
+    }
+    
+    public WordList(HashSet<string> patterns)
+    {
+        int[] lengths = patterns.Select(pattern => pattern.Length).Distinct().ToArray();
+        Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
+        {
+            if (!lengths.Contains(word.Length)) return;
+            string pattern = Word.MakePattern(word);
+            if (patterns.Contains(pattern))
             {
                 lock(_words)
                 {
-                    if (!_words.TryGetValue(pattern, out List<string>? list))
+                    if (_words.TryGetValue(pattern, out List<string>? list))
                     {
-                        _words[pattern] = list = [];
+                        list.Add(word);
                     }
-                    list.Add(word);
+                    else
+                    {
+                        _words.Add(pattern, [word,]);
+                    }
                 }
             }
         });
