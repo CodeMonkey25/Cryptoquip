@@ -39,6 +39,7 @@ public class Puzzle
     public string[] GetFilteredAndDistinctWords()
     {
         return GetAllWords()
+            .Select(static w => w.Trim('.', ',', '!', '?', '"'))
             .Where(static w => w.All(static c => char.IsLetter(c) || c == '\''))
             .Distinct()
             .ToArray();
