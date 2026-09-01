@@ -2,7 +2,7 @@
 
 namespace Cryptoquip.Services;
 
-public abstract class DecoderRingAbstract
+public abstract class DecoderRing
 {
     protected HashSet<char> Hints = [];
     
@@ -81,5 +81,14 @@ public abstract class DecoderRingAbstract
         return Hints.Contains(letter);
     }
     
-    public abstract DecoderRingAbstract Clone();
+    public abstract DecoderRing Clone();
+    
+    public virtual void Overwrite(DecoderRing other)
+    {
+        Clear();
+        foreach (char letter in other.GetUsedLetters())
+        {
+            Put(letter, other.Get(letter));
+        }
+    }
 }

@@ -8,7 +8,7 @@ public class Puzzle
     public string OriginalText { get; }
     public ReadOnlyMemory<char> Text { get; set; }
 
-    public Puzzle(string text, DecoderRingAbstract ring)
+    public Puzzle(string text, DecoderRing ring)
     {
         OriginalText = text;
         ring.Clear();

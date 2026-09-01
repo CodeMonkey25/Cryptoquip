@@ -13,7 +13,7 @@ class Program
      
         Stopwatch watch = Stopwatch.StartNew();
         
-        DecoderRingAbstract ring = new DecoderRingArray();
+        DecoderRing ring = new DecoderRingArray();
         Puzzle puzzle = new(text, ring);
         WordList? wordList = null;
         Solver solver = new();

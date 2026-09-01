@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Services;
 
-public class DecoderRingNull : DecoderRingAbstract
+public class DecoderRingNull : DecoderRing
 {
     public override int SolveCount => 0;
     public override void Put(char letter, char match) { }
@@ -15,5 +15,5 @@ public class DecoderRingNull : DecoderRingAbstract
     public override IEnumerable<char> GetUsedLetters() => [];
     public override IEnumerable<char> GetUnusedLetters() => [];
     public override bool WasSetFromHint(char letter) => false;
-    public override DecoderRingAbstract Clone() => new DecoderRingNull();
+    public override DecoderRing Clone() => new DecoderRingNull();
 }

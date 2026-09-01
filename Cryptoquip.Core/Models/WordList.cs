@@ -49,7 +49,7 @@ public class WordList
         //     .ToDictionary(static g => g.Key, static g => g.Select(w => w.Word).ToArray(), comparer);
     }
 
-    public List<string> GetMatches(Word word, DecoderRingAbstract ring)
+    public List<string> GetMatches(Word word, DecoderRing ring)
     {
         return _words
             .GetValueOrDefault(word.Pattern, [])

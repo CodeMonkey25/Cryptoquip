@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Services;
 
-public class DecoderRingDictionary : DecoderRingAbstract
+public class DecoderRingDictionary : DecoderRing
 {
     private Dictionary<char, char> _map = new();
     public override int SolveCount => _map.Count;
@@ -44,7 +44,7 @@ public class DecoderRingDictionary : DecoderRingAbstract
         base.Clear();
     }
 
-    public override DecoderRingAbstract Clone()
+    public override DecoderRing Clone()
     {
         DecoderRingDictionary that = new()
         {

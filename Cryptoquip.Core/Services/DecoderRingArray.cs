@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Services;
 
-public class DecoderRingArray : DecoderRingAbstract
+public class DecoderRingArray : DecoderRing
 {
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
     private bool[] _usedLetters = new bool[26];
@@ -83,13 +83,14 @@ public class DecoderRingArray : DecoderRingAbstract
         base.Clear();
     }
 
-    public override DecoderRingAbstract Clone()
+    public override DecoderRing Clone()
     {
         DecoderRingArray that = new()
         {
             _cypher = this._cypher.ToArray(),
             Hints = this.Hints.ToHashSet(),
             _usedLetters = this._usedLetters.ToArray(),
+            _solveCount = 0,
         };
         return that;
     }

@@ -41,7 +41,7 @@ public partial class WordView : UserControl
     {
         if (!(DataContext is WordViewModel vm)) return;
         
-        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
+        DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
         WordList words = Locator.Current.GetRequiredService<WordList>();
         List<string> candidates = words.GetMatches(vm.Word, ring);
 

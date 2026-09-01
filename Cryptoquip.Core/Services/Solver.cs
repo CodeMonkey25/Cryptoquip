@@ -6,9 +6,9 @@ namespace Cryptoquip.Services;
 public class Solver
 {
     private readonly List<string> _skipWords = new();
-    private DecoderRingAbstract _partialSolution = new DecoderRingNull();
+    private DecoderRing _partialSolution = new DecoderRingNull();
     
-    public void Run(Action<string> logMessage, DecoderRingAbstract ring, WordList? wordList, Puzzle puzzle,
+    public void Run(Action<string> logMessage, DecoderRing ring, WordList? wordList, Puzzle puzzle,
         bool enableExclusionAnalysis)
     {
         logMessage($"Received puzzle: {puzzle}");
@@ -82,14 +82,14 @@ public class Solver
         if (!_solveLoop(ref ring, words, startIndex))
         {
             logMessage("Could not find a solution. Printing the best attempt.");
-            ring = _partialSolution;
+            ring.Overwrite(_partialSolution);
         }
 
         logMessage(string.Empty);
         logMessage(ring.Decode(puzzle.Text));
     }
     
-    private bool _solveLoop(ref DecoderRingAbstract ring, Word[] words, int depth)
+    private bool _solveLoop(ref DecoderRing ring, Word[] words, int depth)
     {
         // depth exceeds the length of the array, we must have solved it...
         if (depth >= words.Length) return true;

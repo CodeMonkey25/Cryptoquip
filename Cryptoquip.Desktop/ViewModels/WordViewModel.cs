@@ -66,7 +66,7 @@ public class WordViewModel : ViewModelBase
     
     public Unit SolveWord(string decodedWord)
     {
-        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
+        DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
 
         foreach ((char l, char m) in Word.Text.Zip(decodedWord))
         {

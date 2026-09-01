@@ -38,7 +38,7 @@ public partial class LetterView : UserControl
         if (!char.IsLetter(vm.Letter)) return;
         if (vm.WasSetFromHint) return;
         
-        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
+        DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
 
         MenuFlyout flyout = new MenuFlyout()
         {

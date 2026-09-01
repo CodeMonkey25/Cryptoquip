@@ -21,7 +21,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public void LoadPuzzle(string text)
     {
-        DecoderRingAbstract ring = Locator.Current.GetRequiredService<DecoderRingAbstract>();
+        DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
         
         Puzzle = new(text, ring);
         
