@@ -10,7 +10,7 @@ public class DecoderRingArray : DecoderRingAbstract
 
     public override void Put(char letter, char match)
     {
-        if (char.IsLetter(letter))
+        if (char.IsAsciiLetterUpper(letter))
         {
             int i = letter - 'A';
             _cypher[i] = match;
@@ -24,7 +24,7 @@ public class DecoderRingArray : DecoderRingAbstract
 
     public override char Get(char letter)
     {
-        if (char.IsLetter(letter))
+        if (char.IsAsciiLetterUpper(letter))
         {
             int i = letter - 'A';
             return _cypher[i];
@@ -35,20 +35,23 @@ public class DecoderRingArray : DecoderRingAbstract
 
     public override void Remove(char letter)
     {
-        if (char.IsLetter(letter))
+        if (char.IsAsciiLetterUpper(letter))
         {
             int i = letter - 'A';
             char match = _cypher[i];
-            _cypher[i] = '-';
-            i = match - 'A';
-            _usedLetters[i] = false;
-            _solveCount--;
+            if (match != '-')
+            {
+                _cypher[i] = '-';
+                i = match - 'A';
+                _usedLetters[i] = false;
+                _solveCount--;
+            }
         }
     }
 
     public override bool Contains(char letter)
     {
-        if (char.IsLetter(letter))
+        if (char.IsAsciiLetterUpper(letter))
         {
             int i = letter - 'A';
             return _cypher[i] != '-';
