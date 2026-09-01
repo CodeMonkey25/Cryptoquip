@@ -11,6 +11,8 @@ public class Solver
     public void Run(Action<string> logMessage, DecoderRing ring, WordList? wordList, Puzzle puzzle,
         bool enableExclusionAnalysis)
     {
+        _partialSolution = new DecoderRingNull();
+        
         logMessage($"Received puzzle: {puzzle}");
         logMessage(string.Empty);
         
