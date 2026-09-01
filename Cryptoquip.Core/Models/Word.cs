@@ -16,31 +16,32 @@ public class Word
 
     public static string MakePattern(string text)
     {
-        Span<char> patternMap = stackalloc char[26];
-        int patternDepth = 0;
-        char[] chars = new char[text.Length];
-        for (int i = 0; i < text.Length; i++)
+        return string.Create(text.Length, text, static (chars, source) =>
         {
-            char c = text[i];
-            if (!char.IsLetter(c))
+            int patternDepth = 0;
+            Span<char> patternMap = stackalloc char[26];
+            for (int i = 0; i < source.Length; i++)
             {
-                chars[i] = c;
-                continue;
-            }
+                char c = source[i];
+                if (!char.IsLetter(c))
+                {
+                    chars[i] = c;
+                    continue;
+                }
 
-            int patternIndex = c - 'A';
-            char match = patternMap[patternIndex];
-            if (match != '\0')
-            {
+                int patternIndex = c - 'A';
+                char match = patternMap[patternIndex];
+                if (match != '\0')
+                {
+                    chars[i] = match;
+                    continue;
+                }
+                match = (char)('A' + patternDepth);
+                patternDepth++;
+                patternMap[patternIndex] = match;
                 chars[i] = match;
-                continue;
             }
-            match = (char)('A' + patternDepth);
-            patternDepth++;
-            patternMap[patternIndex] = match;
-            chars[i] = match;
-        }
-        return new string(chars);
+        });
     }
 
     public MatchRequirements GetMatchRequirements()
