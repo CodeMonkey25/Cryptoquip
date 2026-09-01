@@ -4,19 +4,9 @@ public class DecoderRingArray : DecoderRingAbstract
 {
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
     private bool[] _usedLetters = new bool[26];
+    private int _solveCount;
 
-    public override int SolveCount
-    {
-        get
-        {
-            int count = 0;
-            foreach (bool b in _usedLetters)
-            {
-                if (b) count++;
-            }
-            return count;
-        }
-    }
+    public override int SolveCount => _solveCount;
 
     public override void Put(char letter, char match)
     {
@@ -27,6 +17,8 @@ public class DecoderRingArray : DecoderRingAbstract
             
             i = match - 'A';
             _usedLetters[i] = true;
+            
+            _solveCount++;
         }
     }
 
@@ -50,6 +42,7 @@ public class DecoderRingArray : DecoderRingAbstract
             _cypher[i] = '-';
             i = match - 'A';
             _usedLetters[i] = false;
+            _solveCount--;
         }
     }
 
@@ -83,6 +76,7 @@ public class DecoderRingArray : DecoderRingAbstract
         for (int i = 0; i < _cypher.Length; i++)
             _cypher[i] = '-';
         Array.Clear(_usedLetters);
+        _solveCount = 0;
         base.Clear();
     }
 
