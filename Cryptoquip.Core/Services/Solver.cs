@@ -100,7 +100,8 @@ public class Solver
         }
 		
         Word word = words[depth];
-        Span<bool> candidates = stackalloc bool[26];
+        Span<char> candidates = stackalloc char[word.Text.Length];
+        int candidateCount = 0;
         foreach(string possibleMatch in word.Matches)
         {
             if (!ring.Matches(word.Text, possibleMatch)) continue;
@@ -114,7 +115,8 @@ public class Solver
 
                 char m = possibleMatch[i];
                 ring.Put(l, m);
-                candidates[l - 'A'] = true;
+                candidates[candidateCount] = l;
+                candidateCount++;
             }
 
             // recurse, returning if the puzzle is solved...
@@ -122,14 +124,11 @@ public class Solver
                 return true;
 
             // remove candidate letter matches
-            for (int i = 0; i < candidates.Length; i++)
+            for (int i = 0; i < candidateCount; i++)
             {
-                if (candidates[i])
-                {
-                    ring.Remove((char)('A' + i));
-                    candidates[i] = false;
-                }
+                ring.Remove(candidates[i]);
             }
+            candidateCount = 0;
         }
 		
         return false;
