@@ -70,7 +70,7 @@ public class WordViewModel : ViewModelBase
 
         foreach ((char l, char m) in Word.Text.Zip(decodedWord))
         {
-            if (!char.IsLetter(l)) continue;
+            if (!char.IsAsciiLetterUpper(l)) continue;
             if (ring.Contains(l)) continue;
             ring.Put(l, m);
             Letters.First(lvm => lvm.Letter == l).Update();

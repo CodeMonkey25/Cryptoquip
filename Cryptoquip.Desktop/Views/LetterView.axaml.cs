@@ -35,7 +35,7 @@ public partial class LetterView : UserControl
     private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!(DataContext is LetterViewModel vm)) return;
-        if (!char.IsLetter(vm.Letter)) return;
+        if (!char.IsAsciiLetterUpper(vm.Letter)) return;
         if (vm.WasSetFromHint) return;
         
         DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();

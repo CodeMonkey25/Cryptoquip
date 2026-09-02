@@ -10,19 +10,16 @@ public class Puzzle
 
     public Puzzle(string text, DecoderRing ring)
     {
-        OriginalText = text;
+        OriginalText = text.ToUpper().Trim();
+        Text = text.ToUpper().Trim().AsMemory();
         ring.Clear();
         
         int i = text.IndexOf("<HINT>:", StringComparison.Ordinal);
-        if (i < 0)
+        if (i >= 0)
         {
-            Text = text.AsMemory();
-        }
-        else
-        {
-            Text = text.AsMemory(0, i);
-            ReadOnlyMemory<char> hint = text.AsMemory(i + 7, text.Length - i - 7);
+            ReadOnlyMemory<char> hint = Text.Slice(i + 7, text.Length - i - 7);
             ring.LoadHints(hint);
+            Text = Text.Slice(0, i);
         }
     }
 
@@ -39,8 +36,12 @@ public class Puzzle
     public string[] GetFilteredAndDistinctWords()
     {
         return GetAllWords()
-            .Select(static w => w.Trim('.', ',', '!', '?', '"'))
-            .Where(static w => w.All(static c => char.IsLetter(c) || c == '\''))
+            .Select(static w => w.Trim('.'))
+            .Select(static w => w.Trim(','))
+            .Select(static w => w.Trim('!'))
+            .Select(static w => w.Trim('?'))
+            .Select(static w => w.Trim('"'))
+            .Where(static w => w.All(static c => char.IsAsciiLetterUpper(c) || c == '\''))
             .Distinct()
             .ToArray();
     }

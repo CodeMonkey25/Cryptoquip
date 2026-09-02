@@ -5,7 +5,7 @@ public class Word
     public string Text { get; }
     public string Pattern { get; }
     public List<string> Matches { get; set; }
-    public bool IsSolvable => Text.Any(char.IsLetter) && !Text.Any(char.IsWhiteSpace);
+    public bool IsSolvable => Text.Any(char.IsAsciiLetterUpper) && !Text.Any(char.IsWhiteSpace);
     
     public Word(string text)
     {
@@ -23,7 +23,7 @@ public class Word
             for (int i = 0; i < source.Length; i++)
             {
                 char c = source[i];
-                if (!char.IsLetter(c))
+                if (!char.IsAsciiLetterUpper(c))
                 {
                     chars[i] = c;
                     continue;

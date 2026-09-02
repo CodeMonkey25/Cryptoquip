@@ -47,8 +47,8 @@ public abstract class DecoderRing
             {
                 char c1 = parts[0].Span[i];
                 char c2 = parts[1].Span[i];
-                if (!char.IsLetter(c1)) continue;
-                if (!char.IsLetter(c2)) continue;
+                if (!char.IsAsciiLetterUpper(c1)) continue;
+                if (!char.IsAsciiLetterUpper(c2)) continue;
                 Put(c1, c2);
                 Hints.Add(c1);
             }

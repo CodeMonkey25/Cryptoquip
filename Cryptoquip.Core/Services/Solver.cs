@@ -112,7 +112,7 @@ public class Solver
             for (int i = 0; i < word.Text.Length; i++)
             {
                 char l = word.Text[i];
-                if (!char.IsLetter(l)) continue;
+                if (!char.IsAsciiLetterUpper(l)) continue;
                 if (ring.Contains(l)) continue;
 
                 char m = possibleMatch[i];

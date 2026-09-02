@@ -28,16 +28,6 @@ public static class ReadOnlyMemoryExtensions
         return result;
     }
 
-    public static bool Any<T>(this ReadOnlyMemory<T> source, Func<T, bool> predicate)
-    {
-        foreach (T item in source.Span)
-        {
-            if (predicate(item))
-                return true;
-        }
-        return false;
-    }
-
     public static bool Any(this ReadOnlyMemory<char> source, Predicate<char> predicate)
     {
         foreach (char c in source.Span)
@@ -46,16 +36,6 @@ public static class ReadOnlyMemoryExtensions
                 return true;
         }
         return false;
-    }
-
-    public static bool All<T>(this ReadOnlyMemory<T> source, Func<T, bool> predicate)
-    {
-        foreach (T item in source.Span)
-        {
-            if (!predicate(item))
-                return false;
-        }
-        return true;
     }
 
     public static bool All(this ReadOnlyMemory<char> source, Predicate<char> predicate)
