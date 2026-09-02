@@ -90,5 +90,9 @@ public abstract class DecoderRing
         {
             Put(letter, other.Get(letter));
         }
+        foreach (char hint in other.Hints)
+        {
+            Hints.Add(hint);
+        }
     }
 }

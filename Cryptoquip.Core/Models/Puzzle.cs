@@ -11,7 +11,7 @@ public class Puzzle
     public Puzzle(string text, DecoderRing ring)
     {
         OriginalText = text.ToUpper().Trim();
-        Text = text.ToUpper().Trim().AsMemory();
+        Text = OriginalText.AsMemory();
         ring.Clear();
         
         int i = text.IndexOf("<HINT>:", StringComparison.Ordinal);
