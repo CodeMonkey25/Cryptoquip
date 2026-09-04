@@ -4,6 +4,7 @@ public class Word
 {
     public string Text { get; }
     public string Pattern { get; }
+    public uint LetterMask { get; }
     public List<string> Matches { get; set; }
     public bool IsSolvable => Text.Any(char.IsAsciiLetterUpper) && !Text.Any(char.IsWhiteSpace);
     
@@ -12,6 +13,7 @@ public class Word
         Text = text;
         Pattern = MakePattern(text);
         Matches = [];
+        LetterMask = MakeTextLetterMask(text);
     }
 
     public static string MakePattern(string text)
@@ -44,13 +46,23 @@ public class Word
         });
     }
 
+    private static uint MakeTextLetterMask(string text)
+    {
+        uint mask = 0;
+        foreach (char c in text)
+        {
+            if (char.IsAsciiLetterUpper(c)) mask |= 1u << (c - 'A');
+        }
+        return mask;
+    }
+
     public MatchRequirements GetMatchRequirements()
     {
         return MatchRequirements.Build(Text, Matches);
     }
 
-    public void EnsureMatchRequirements(MatchRequirements requirements)
+    public int EnsureMatchRequirements(MatchRequirements requirements)
     {
-        Matches.RemoveAll(match => !requirements.Matches(Text, match));
+        return Matches.RemoveAll(match => !requirements.Matches(Text, match));
     }
 }

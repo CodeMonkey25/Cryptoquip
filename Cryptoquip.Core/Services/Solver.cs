@@ -46,23 +46,38 @@ public class Solver
         {
             logMessage(string.Empty);
             logMessage("Performing exclusion analysis...");
-
+            
+            MatchRequirements?[] requirementsArray = new MatchRequirements[words.Length];
             int deleted = -1;
             while (deleted != 0)
             {
                 deleted = 0;
-                foreach (Word word in words)
+                for (int i = 0; i < words.Length; i++)
                 {
-                    MatchRequirements requirements = word.GetMatchRequirements();
-                    if (requirements.Count == 0) continue;
-                    foreach (Word otherWord in words)
+                    Word word = words[i];
+                    if (requirementsArray[i] == null)
                     {
-                        if(word == otherWord) continue;
-                        deleted += otherWord.Matches.Count;
-                        otherWord.EnsureMatchRequirements(requirements);
-                        deleted -= otherWord.Matches.Count;
+                        requirementsArray[i] = word.GetMatchRequirements();
+                    }
+
+                    MatchRequirements requirements = requirementsArray[i]!;
+                    if (requirements.Count == 0) continue;
+                    for (int j = 0; j < words.Length; j++)
+                    {
+                        Word otherWord = words[j];
+                        if (i == j) continue;
+                        if ((word.LetterMask & otherWord.LetterMask) == 0) continue;
+
+                        int count = otherWord.EnsureMatchRequirements(requirements);
+
+                        if (count > 0)
+                        {
+                            requirementsArray[j] = null;
+                            deleted += count;
+                        }
                     }
                 }
+
                 logMessage("\tDeleted " + deleted + " words...");
             }
             logMessage(string.Empty);
