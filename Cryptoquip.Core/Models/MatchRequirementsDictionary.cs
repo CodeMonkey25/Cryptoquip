@@ -37,4 +37,9 @@ public class MatchRequirementsDictionary : MatchRequirements
         }
         return true;
     }
+    
+    public override void Clear()
+    {
+        _requirements.Clear();
+    }
 }

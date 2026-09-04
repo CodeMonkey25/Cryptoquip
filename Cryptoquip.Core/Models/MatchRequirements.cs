@@ -9,14 +9,22 @@ public abstract class MatchRequirements
     public static MatchRequirements Build(string text, IEnumerable<string> matches)
     {
         MatchRequirements requirements = new MatchRequirementsBitmask();
+        requirements.Rebuild(text, matches);
+        return requirements;
+    }
+    
+    public void Rebuild(string text, IEnumerable<string> matches)
+    {
+        Clear();
         foreach (string match in matches)
         {
-            requirements.RegisterMatch(text, match);
+            RegisterMatch(text, match);
         }
-        return requirements;
     }
     
     protected abstract void RegisterMatch(string text, string match);
     
     public abstract bool Matches(string text, string match);
+    
+    public abstract void Clear();
 }

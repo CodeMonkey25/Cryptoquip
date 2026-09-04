@@ -46,4 +46,13 @@ public class MatchRequirementsArray : MatchRequirements
         }
         return true;
     }
+    
+    public override void Clear()
+    {
+        _count = 0;
+        for (int i = 0; i < _requirements.Length; i++)
+        {
+            _requirements[i] = null;
+        }
+    }
 }

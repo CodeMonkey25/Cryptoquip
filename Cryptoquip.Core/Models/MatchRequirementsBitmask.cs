@@ -39,4 +39,13 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
         }
         return true;
     }
+    
+    public override void Clear()
+    {
+        _count = 0;
+        for (int i = 0; i < _allowedMasks.Length; i++)
+        {
+            _allowedMasks[i] = 0;
+        }
+    }
 }
