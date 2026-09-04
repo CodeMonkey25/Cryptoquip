@@ -64,27 +64,25 @@ public class WordList
     
     public WordList(HashSet<string> patterns)
     {
-        int[] lengths = patterns.Select(pattern => pattern.Length).Distinct().ToArray();
+        HashSet<int> lengths = patterns.Select(pattern => pattern.Length).ToHashSet();
         
         Parallel.ForEach(
             File.ReadLines(DictionaryFileName),
             () => new Dictionary<string, List<string>>(StringComparer.Ordinal),
             (word, _, localDict) =>
             {
-                if (lengths.Contains(word.Length))
+                if (!lengths.Contains(word.Length)) return localDict;
+                
+                string pattern = Word.MakePattern(word);
+                if (!patterns.Contains(pattern)) return localDict;
+                
+                if (localDict.TryGetValue(pattern, out List<string>? list))
                 {
-                    string pattern = Word.MakePattern(word);
-                    if (patterns.Contains(pattern))
-                    {
-                        if (localDict.TryGetValue(pattern, out List<string>? list))
-                        {
-                            list.Add(word);
-                        }
-                        else
-                        {
-                            localDict.Add(pattern, [word,]);
-                        }
-                    }
+                    list.Add(word);
+                }
+                else
+                {
+                    localDict.Add(pattern, [word,]);
                 }
                 return localDict;
             },
