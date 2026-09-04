@@ -1,4 +1,6 @@
-﻿namespace Cryptoquip.Models;
+﻿using System.Runtime.InteropServices;
+
+namespace Cryptoquip.Models;
 
 public class Word
 {
@@ -63,6 +65,18 @@ public class Word
 
     public int EnsureMatchRequirements(MatchRequirements requirements)
     {
-        return Matches.RemoveAll(match => !requirements.Matches(Text, match));
+        Span<string> matches = CollectionsMarshal.AsSpan(Matches);
+        int write = 0;
+        for (int read = 0; read < matches.Length; read++)
+        {
+            string match = matches[read];
+            if (!requirements.Matches(Text, match)) continue;
+            matches[write] = match;
+            write++;
+        }
+
+        int removed = matches.Length - write;
+        if (removed > 0) Matches.RemoveRange(write, removed);
+        return removed;
     }
 }
