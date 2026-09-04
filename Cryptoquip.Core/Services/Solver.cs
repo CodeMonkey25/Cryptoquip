@@ -47,40 +47,38 @@ public class Solver
             logMessage(string.Empty);
             logMessage("Performing exclusion analysis...");
             
-            MatchRequirements?[] requirementsArray = new MatchRequirements[words.Length];
-            int deleted = -1;
-            while (deleted != 0)
+            Queue<int> worklist = new(words.Length);
+            bool[] queued = new bool[words.Length];
+            for (int i = 0; i < words.Length; i++)
             {
-                deleted = 0;
-                for (int i = 0; i < words.Length; i++)
-                {
-                    Word word = words[i];
-                    if (requirementsArray[i] == null)
-                    {
-                        requirementsArray[i] = word.GetMatchRequirements();
-                    }
-
-                    MatchRequirements requirements = requirementsArray[i]!;
-                    if (requirements.Count == 0) continue;
-                    for (int j = 0; j < words.Length; j++)
-                    {
-                        Word otherWord = words[j];
-                        if (i == j) continue;
-                        if ((word.LetterMask & otherWord.LetterMask) == 0) continue;
-
-                        int count = otherWord.EnsureMatchRequirements(requirements);
-
-                        if (count > 0)
-                        {
-                            requirementsArray[j] = null;
-                            deleted += count;
-                        }
-                    }
-                }
-
-                logMessage("\tDeleted " + deleted + " words...");
+                worklist.Enqueue(i);
+                queued[i] = true;
             }
-            logMessage(string.Empty);
+
+            MatchRequirements requirements = new MatchRequirementsBitmask();
+            int deleted = 0;
+            while (worklist.TryDequeue(out int i))
+            {
+                queued[i] = false;
+                Word word = words[i];
+
+                requirements.Rebuild(word.Text, word.Matches);      // dequeued == dirty, so this is the only rebuild needed
+
+                for (int j = 0; j < words.Length; j++)
+                {
+                    if (j == i) continue;
+                    if ((word.LetterMask & words[j].LetterMask) == 0) continue;
+
+                    int removed = words[j].EnsureMatchRequirements(requirements);
+                    if (removed == 0) continue;
+
+                    deleted += removed;
+                    if (queued[j]) continue;
+                    worklist.Enqueue(j);
+                    queued[j] = true;
+                }
+            }
+            logMessage("Deleted " + deleted + " words...");
 			
             words = words.OrderBy(static w => w.Matches.Count).ThenByDescending(static w => w.Text.Length).ToArray();
             foreach (Word word in words)
