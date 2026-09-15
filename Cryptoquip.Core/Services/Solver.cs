@@ -1,11 +1,10 @@
 ﻿using Cryptoquip.Models;
-using Cryptoquip.Utility;
 
 namespace Cryptoquip.Services;
 
 public class Solver
 {
-    private readonly List<string> _skipWords = new();
+    // private readonly List<string> _skipWords = new();
     private DecoderRing _partialSolution = new DecoderRingNull();
     
     public void Run(Action<string> logMessage, DecoderRing ring, WordList? wordList, Puzzle puzzle,
@@ -18,7 +17,7 @@ public class Solver
         
         Word[] words = puzzle
             .GetFilteredAndDistinctWords()
-            .Where(w => !_skipWords.Contains(w))
+            // .Where(w => !_skipWords.Contains(w))
             .Select(static w => new Word(w))
             .ToArray();
         logMessage($"Found {words.Length} unique words to solve.");
