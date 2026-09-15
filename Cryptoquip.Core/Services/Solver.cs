@@ -44,7 +44,7 @@ public class Solver
         {
             logMessage("\t" + word.Text + " (" + word.Matches.Count + ")");
         }
-        logMessage($"Word matches are ready.");
+        logMessage("Word matches are ready.");
         
         if (enableExclusionAnalysis)
         {
