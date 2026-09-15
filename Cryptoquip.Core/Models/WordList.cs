@@ -45,6 +45,12 @@ public class WordList
             }
         );
         
+        _words.TrimExcess();
+        foreach (List<string> value in _words.Values)
+        {
+            value.TrimExcess();
+        }
+        
         // Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
         // {
         //     string pattern = Word.MakePattern(word);
@@ -105,6 +111,12 @@ public class WordList
             }
         );
         
+        _words.TrimExcess();
+        foreach (List<string> value in _words.Values)
+        {
+            value.TrimExcess();
+        }
+        
         // int[] lengths = patterns.Select(pattern => pattern.Length).Distinct().ToArray();
         // Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
         // {
@@ -151,9 +163,13 @@ public class WordList
 
     public List<string> GetMatches(Word word, DecoderRing ring)
     {
-        return _words
+        List<string> matches = _words
             .GetValueOrDefault(word.Pattern, [])
             .Where(w => ring.Matches(word.Text, w))
             .ToList();
+        
+        matches.TrimExcess();
+        
+        return matches;
     }
 }
