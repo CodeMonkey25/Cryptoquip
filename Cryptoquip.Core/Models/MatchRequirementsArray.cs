@@ -2,11 +2,7 @@
 
 public class MatchRequirementsArray : MatchRequirements
 {
-    private int _count = 0;
-    
     private readonly bool[]?[] _requirements = new bool[26][];
-    
-    public override int Count => _count;
     
     protected override void RegisterMatch(string text, string match)
     {
@@ -26,7 +22,6 @@ public class MatchRequirementsArray : MatchRequirements
         if (_requirements[i] == null)
         {
             _requirements[i] = new bool[26];
-            _count++;
         }
         _requirements[i][m - 'A'] = true;
     }
@@ -49,7 +44,6 @@ public class MatchRequirementsArray : MatchRequirements
     
     public override void Clear()
     {
-        _count = 0;
         for (int i = 0; i < _requirements.Length; i++)
         {
             _requirements[i] = null;

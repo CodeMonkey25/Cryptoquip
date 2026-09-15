@@ -4,9 +4,6 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
 {
     // Bit i (0..25) is set if ('A' + i) is an allowed plain character
     private readonly uint[] _allowedMasks = new uint[26];
-    private int _count;
-
-    public override int Count => _count;
 
     protected override void RegisterMatch(string text, string match)
     {
@@ -17,7 +14,6 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
             if (l is >= 'A' and <= 'Z' && m is >= 'A' and <= 'Z')
             {
                 int index = l - 'A';
-                if (_allowedMasks[index] == 0) _count++;
                 _allowedMasks[index] |= 1u << (m - 'A');
             }
         }
@@ -42,7 +38,6 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
     
     public override void Clear()
     {
-        _count = 0;
         Array.Clear(_allowedMasks);
     }
 }

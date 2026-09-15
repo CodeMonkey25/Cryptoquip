@@ -3,8 +3,6 @@
 public class MatchRequirementsDictionary : MatchRequirements
 {
     private readonly Dictionary<char, HashSet<char>> _requirements = new();
-    
-    public override int Count => _requirements.Count;
 
     protected override void RegisterMatch(string text, string match)
     {

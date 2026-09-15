@@ -2,10 +2,6 @@
 
 public abstract class MatchRequirements
 {
-    public abstract int Count { get; }
-
-    protected MatchRequirements() { }
-   
     public static MatchRequirements Build() => new MatchRequirementsBitmask();
     
     public static MatchRequirements Build(string text, IEnumerable<string> matches)
