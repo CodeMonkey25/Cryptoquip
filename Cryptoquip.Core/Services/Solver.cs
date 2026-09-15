@@ -34,7 +34,11 @@ public class Solver
         {
             word.Matches = wordList.GetMatches(word, ring);
         }
-        words = words.OrderBy(static w => w.Matches.Count).ThenByDescending(static w => w.Text.Length).ToArray();
+        
+        if (!enableExclusionAnalysis)
+        {
+            words = words.OrderBy(static w => w.Matches.Count).ThenByDescending(static w => w.Text.Length).ToArray();
+        }
         
         foreach (Word word in words)
         {
@@ -47,22 +51,20 @@ public class Solver
             logMessage(string.Empty);
             logMessage("Performing exclusion analysis...");
             
-            Queue<int> worklist = new(words.Length);
-            bool[] queued = new bool[words.Length];
+            PriorityQueue<int, int> worklist = new();
             for (int i = 0; i < words.Length; i++)
             {
-                worklist.Enqueue(i);
-                queued[i] = true;
+                worklist.Enqueue(i, words[i].Matches.Count);
             }
 
             MatchRequirements requirements = new MatchRequirementsBitmask();
             int deleted = 0;
-            while (worklist.TryDequeue(out int i))
+            while (worklist.TryDequeue(out int i, out int priority))
             {
-                queued[i] = false;
                 Word word = words[i];
+                if (priority != word.Matches.Count) continue; // stale entry, skip it
 
-                requirements.Rebuild(word.Text, word.Matches);      // dequeued == dirty, so this is the only rebuild needed
+                requirements.Rebuild(word.Text, word.Matches);
 
                 for (int j = 0; j < words.Length; j++)
                 {
@@ -73,9 +75,7 @@ public class Solver
                     if (removed == 0) continue;
 
                     deleted += removed;
-                    if (queued[j]) continue;
-                    worklist.Enqueue(j);
-                    queued[j] = true;
+                    worklist.Enqueue(j, words[j].Matches.Count);
                 }
             }
             logMessage("Deleted " + deleted + " words...");
