@@ -68,7 +68,7 @@ public class Solver
                 for (int j = 0; j < words.Length; j++)
                 {
                     if (j == i) continue;
-                    if ((word.LetterMask & words[j].LetterMask) == 0) continue;
+                    if ((word.LetterMask & words[j].LetterMask) == 0) continue; // no shared letters, skip it
 
                     int removed = words[j].EnsureMatchRequirements(requirements);
                     if (removed == 0) continue;
