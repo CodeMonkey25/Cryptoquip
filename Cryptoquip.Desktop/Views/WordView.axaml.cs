@@ -43,7 +43,7 @@ public partial class WordView : UserControl
         
         DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
         WordList words = Locator.Current.GetRequiredService<WordList>();
-        List<string> candidates = words.GetMatches(vm.Word, ring);
+        List<string> candidates = words.GetMatches(vm.Word, ring).Order().ToList();
 
         MenuFlyout flyout = new()
         {
