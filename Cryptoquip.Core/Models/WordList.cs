@@ -8,79 +8,19 @@ public class WordList
     private const string DictionaryFileName = @"dictionary.txt";
     private readonly Dictionary<string,List<string>> _words = new();
 
-    public WordList()
+    public WordList(HashSet<string>? patterns = null)
     {
-        Parallel.ForEach(
-            File.ReadLines(DictionaryFileName),
-            () => new Dictionary<string, List<string>>(StringComparer.Ordinal),
-            (word, _, localDict) =>
-            {
-                string pattern = Word.MakePattern(word);
-                if (localDict.TryGetValue(pattern, out List<string>? list))
-                {
-                    list.Add(word);
-                }
-                else
-                {
-                    localDict.Add(pattern, [word,]);
-                }
-                return localDict;
-            },
-            (localDict) =>
-            {
-                lock (_words)
-                {
-                    foreach ((string pattern, List<string> words) in localDict)
-                    {
-                        if (_words.TryGetValue(pattern, out List<string>? mainList))
-                        {
-                            mainList.AddRange(words);
-                        }
-                        else
-                        {
-                            _words.Add(pattern, words);
-                        }
-                    }
-                }
-            }
-        );
-        
-        _words.TrimExcess();
-        foreach (List<string> value in _words.Values)
-        {
-            value.TrimExcess();
-        }
-        
-        // Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
-        // {
-        //     string pattern = Word.MakePattern(word);
-        //     lock(_words)
-        //     {
-        //         if (_words.TryGetValue(pattern, out List<string>? list))
-        //         {
-        //             list.Add(word);
-        //         }
-        //         else
-        //         {
-        //             _words.Add(pattern, [word,]);
-        //         }
-        //     }
-        // });
-    }
-    
-    public WordList(HashSet<string> patterns)
-    {
-        HashSet<int> lengths = patterns.Select(pattern => pattern.Length).ToHashSet();
+        HashSet<int> lengths = patterns?.Select(pattern => pattern.Length).ToHashSet() ?? [];
         
         Parallel.ForEach(
             File.ReadLines(DictionaryFileName),
             () => new Dictionary<string, List<string>>(StringComparer.Ordinal),
             (word, _, localDict) =>
             {
-                if (!lengths.Contains(word.Length)) return localDict;
+                if (patterns != null && !lengths.Contains(word.Length)) return localDict;
                 
                 string pattern = Word.MakePattern(word);
-                if (!patterns.Contains(pattern)) return localDict;
+                if (patterns != null && !patterns.Contains(pattern)) return localDict;
                 
                 if (localDict.TryGetValue(pattern, out List<string>? list))
                 {
