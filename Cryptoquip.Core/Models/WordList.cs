@@ -163,13 +163,14 @@ public class WordList
 
     public List<string> GetMatches(Word word, DecoderRing ring)
     {
-        List<string> matches = _words
-            .GetValueOrDefault(word.Pattern, [])
-            .Where(w => ring.Matches(word.Text, w))
-            .ToList();
-        
-        matches.TrimExcess();
-        
+        if (!_words.TryGetValue(word.Pattern, out List<string>? candidates))
+            return [];
+
+        List<string> matches = new(candidates.Count);
+        foreach (string w in candidates)
+        {
+            if (ring.Matches(word.Text, w)) matches.Add(w);
+        }
         return matches;
     }
 }
