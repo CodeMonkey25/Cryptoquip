@@ -65,6 +65,7 @@ public class Word
 
     public int EnsureMatchRequirements(MatchRequirements requirements)
     {
+        // perform in place compaction while removing unmatched words
         Span<string> matches = CollectionsMarshal.AsSpan(Matches);
         int write = 0;
         for (int read = 0; read < matches.Length; read++)

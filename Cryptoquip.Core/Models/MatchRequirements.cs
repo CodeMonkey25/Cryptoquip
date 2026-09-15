@@ -6,6 +6,8 @@ public abstract class MatchRequirements
 
     protected MatchRequirements() { }
    
+    public static MatchRequirements Build() => new MatchRequirementsBitmask();
+    
     public static MatchRequirements Build(string text, IEnumerable<string> matches)
     {
         MatchRequirements requirements = new MatchRequirementsBitmask();

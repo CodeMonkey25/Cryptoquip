@@ -57,7 +57,7 @@ public class Solver
                 worklist.Enqueue(i, words[i].Matches.Count);
             }
 
-            MatchRequirements requirements = new MatchRequirementsBitmask();
+            MatchRequirements requirements = MatchRequirements.Build();
             int deleted = 0;
             while (worklist.TryDequeue(out int i, out int priority))
             {
