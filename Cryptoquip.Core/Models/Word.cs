@@ -13,10 +13,12 @@ public class Word
     public Word(string text)
     {
         Text = text;
-        Pattern = MakePattern(text, new char[26], new int[26]);
+        Pattern = MakePattern(text);
         Matches = [];
         LetterMask = MakeTextLetterMask(text);
     }
+
+    public static string MakePattern(string text) => MakePattern(text, new char[26], new int[26]);
 
     public static string MakePattern(string text, char[] letterBuffer, int[] touchedBuffer)
     {

@@ -16,11 +16,11 @@ public class WordList
             () => (new Dictionary<string, List<string>>(StringComparer.Ordinal), new char[26], new int[26]),
             (word, _, localState) =>
             {
-                var (localDict, letterBuffer, touchedBuffer) = localState;
-                if (patterns != null && !lengths.Contains(word.Length)) return (localDict, letterBuffer, touchedBuffer);
+                if (patterns != null && !lengths.Contains(word.Length)) return localState;
                 
+                var (localDict, letterBuffer, touchedBuffer) = localState;
                 string pattern = Word.MakePattern(word, letterBuffer, touchedBuffer);
-                if (patterns != null && !patterns.Contains(pattern)) return (localDict, letterBuffer, touchedBuffer);
+                if (patterns != null && !patterns.Contains(pattern)) return localState;
                 
                 if (localDict.TryGetValue(pattern, out List<string>? list))
                 {
@@ -30,7 +30,7 @@ public class WordList
                 {
                     localDict.Add(pattern, [word,]);
                 }
-                return (localDict, letterBuffer, touchedBuffer);
+                return localState;
             },
             (localState) =>
             {
