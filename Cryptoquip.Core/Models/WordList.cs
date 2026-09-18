@@ -24,12 +24,16 @@ public class WordList
         
         Parallel.ForEach(
             File.ReadLines(DictionaryFileName),
-            () => new ThreadState(patterns, lengths, maxPatternLength),
+            () => new ThreadState(patterns, lengths, maxPatternLength, _words),
             static (word, _, threadState) =>
             {
                 if (word.Length < 1) return threadState;
-                if (word.Length > threadState.PatternBuffer.Length) return threadState;
-                if (threadState.Patterns != null && !threadState.Lengths.Contains(word.Length)) return threadState;
+                
+                if (threadState.Patterns != null)
+                {
+                    if (!threadState.Lengths.Contains(word.Length)) return threadState;
+                }
+                else if (word.Length > threadState.PatternBuffer.Length) return threadState;
                 
                 string pattern = Word.MakePattern(word, threadState.PatternBuffer.AsSpan(0, word.Length), threadState.LetterBuffer, threadState.TouchedBuffer);
                 if (threadState.Patterns != null && !threadState.Patterns.Contains(pattern)) return threadState;
@@ -44,19 +48,19 @@ public class WordList
                 }
                 return threadState;
             },
-            (threadState) =>
+            static (threadState) =>
             {
-                lock (_words)
+                lock (threadState.MainDict)
                 {
                     foreach ((string pattern, List<string> words) in threadState.PatternMap)
                     {
-                        if (_words.TryGetValue(pattern, out List<string>? mainList))
+                        if (threadState.MainDict.TryGetValue(pattern, out List<string>? mainList))
                         {
                             mainList.AddRange(words);
                         }
                         else
                         {
-                            _words.Add(pattern, words);
+                            threadState.MainDict.Add(pattern, words);
                         }
                     }
                 }
@@ -127,7 +131,7 @@ public class WordList
         return matches;
     }
     
-    private class ThreadState(IReadOnlySet<string>? patterns, HashSet<int> lengths, int maxPatternLength)
+    private class ThreadState(IReadOnlySet<string>? patterns, HashSet<int> lengths, int maxPatternLength, Dictionary<string, List<string>> mainDict)
     {
         public readonly IReadOnlySet<string>? Patterns = patterns;
         public readonly HashSet<int> Lengths = lengths;
@@ -135,5 +139,6 @@ public class WordList
         public readonly char[] PatternBuffer = new char[maxPatternLength];
         public readonly char[] LetterBuffer = new char[26];
         public readonly int[] TouchedBuffer = new int[26];
+        public readonly Dictionary<string, List<string>> MainDict = mainDict;
     }
 }
