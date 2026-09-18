@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Services;
 
-public class DecoderRingNull : DecoderRing
+public sealed class DecoderRingNull : DecoderRing
 {
     public override int SolveCount => 0;
     public override void Put(char letter, char match) { }

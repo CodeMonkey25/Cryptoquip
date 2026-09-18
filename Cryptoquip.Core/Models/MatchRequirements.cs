@@ -4,20 +4,18 @@ public abstract class MatchRequirements
 {
     public static MatchRequirements Build() => new MatchRequirementsBitmask();
     
-    public static MatchRequirements Build(string text, IEnumerable<string> matches)
+    public static MatchRequirements Build(string text, List<string> matches)
     {
         MatchRequirements requirements = new MatchRequirementsBitmask();
         requirements.Rebuild(text, matches);
         return requirements;
     }
     
-    public void Rebuild(string text, IEnumerable<string> matches)
+    public void Rebuild(string text, List<string> matches)
     {
         Clear();
-        foreach (string match in matches)
-        {
-            RegisterMatch(text, match);
-        }
+        for (int i = 0; i < matches.Count; i++)
+            RegisterMatch(text, matches[i]);
     }
     
     protected abstract void RegisterMatch(string text, string match);

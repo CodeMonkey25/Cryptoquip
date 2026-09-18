@@ -4,7 +4,7 @@ namespace Cryptoquip.Services;
 
 public abstract class DecoderRing
 {
-    protected HashSet<char> Hints = [];
+    protected internal HashSet<char> Hints = [];
     
     public abstract int SolveCount { get; }
     public abstract void Put(char letter, char match);

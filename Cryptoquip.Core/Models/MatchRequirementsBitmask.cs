@@ -11,7 +11,7 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
         {
             char l = text[i];
             char m = match[i];
-            if (l is >= 'A' and <= 'Z' && m is >= 'A' and <= 'Z')
+            if (char.IsAsciiLetterUpper(l) && char.IsAsciiLetterUpper(m))
             {
                 int index = l - 'A';
                 _allowedMasks[index] |= 1u << (m - 'A');
@@ -24,13 +24,13 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
         for (int i = 0; i < match.Length; i++)
         {
             char l = text[i];
-            if (l is < 'A' or > 'Z') continue;
+            if (!char.IsAsciiLetterUpper(l)) continue;
 
             uint mask = _allowedMasks[l - 'A'];
             if (mask == 0) continue; // No constraint on this letter
 
             char m = match[i];
-            if (m is < 'A' or > 'Z' || (mask & (1u << (m - 'A'))) == 0)
+            if (!char.IsAsciiLetterUpper(m) || (mask & (1u << (m - 'A'))) == 0)
                 return false;
         }
         return true;

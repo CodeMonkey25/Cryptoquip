@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Services;
 
-public class DecoderRingDictionary : DecoderRing
+public sealed class DecoderRingDictionary : DecoderRing
 {
     private Dictionary<char, char> _map = new();
     public override int SolveCount => _map.Count;
@@ -49,7 +49,7 @@ public class DecoderRingDictionary : DecoderRing
         return new DecoderRingDictionary
         {
             _map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value),
-            Hints = this.Hints.ToHashSet()
+            Hints = this.Hints.Count == 0 ? [] : this.Hints.ToHashSet()
         };
     }
 }

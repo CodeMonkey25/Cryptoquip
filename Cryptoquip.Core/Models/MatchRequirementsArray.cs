@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Models;
 
-public class MatchRequirementsArray : MatchRequirements
+public sealed class MatchRequirementsArray : MatchRequirements
 {
     private readonly bool[]?[] _requirements = new bool[26][];
     
@@ -9,9 +9,10 @@ public class MatchRequirementsArray : MatchRequirements
         for (int i = 0; i < match.Length; i++)
         {
             char l = text[i];
-            if (l < 'A' || l > 'Z') continue;
+            if (!char.IsAsciiLetterUpper(l)) continue;
             
             char m = match[i];
+            if (!char.IsAsciiLetterUpper(m)) continue;
             RegisterMatch(l, m);
         }
     }
@@ -31,10 +32,11 @@ public class MatchRequirementsArray : MatchRequirements
         for (int i = 0; i < match.Length; i++)
         {
             char l = text[i];
-            if (l < 'A' || l > 'Z') continue;
+            if (!char.IsAsciiLetterUpper(l)) continue;
             if (_requirements[l - 'A'] == null) continue;
 
             char m = match[i];
+            if (!char.IsAsciiLetterUpper(m)) return false;
             if (_requirements[l - 'A'][m - 'A']) continue;
             
             return false;

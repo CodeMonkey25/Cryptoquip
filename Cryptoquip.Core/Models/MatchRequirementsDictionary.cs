@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Models;
 
-public class MatchRequirementsDictionary : MatchRequirements
+public sealed class MatchRequirementsDictionary : MatchRequirements
 {
     private readonly Dictionary<char, HashSet<char>> _requirements = new();
 

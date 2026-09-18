@@ -1,6 +1,6 @@
 ﻿namespace Cryptoquip.Services;
 
-public class DecoderRingArray : DecoderRing
+public sealed class DecoderRingArray : DecoderRing
 {
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
     private bool[] _usedLetters = new bool[26];
@@ -87,9 +87,47 @@ public class DecoderRingArray : DecoderRing
         return new DecoderRingArray()
         {
             _cypher = this._cypher.ToArray(),
-            Hints = this.Hints.ToHashSet(),
+            Hints = this.Hints.Count == 0 ? [] : this.Hints.ToHashSet(),
             _usedLetters = this._usedLetters.ToArray(),
             _solveCount = this._solveCount,
         };
+    }
+
+    public override void Overwrite(DecoderRing other)
+    {
+        if (other is DecoderRingArray otherArray)
+        {
+            Array.Copy(otherArray._cypher, _cypher, _cypher.Length);
+            Array.Copy(otherArray._usedLetters, _usedLetters, _usedLetters.Length);
+            _solveCount = otherArray._solveCount;
+            Hints = other.Hints.Count == 0 ? [] : other.Hints.ToHashSet();
+        }
+        else
+        {
+            base.Overwrite(other);
+        }
+    }
+    
+    // overriding this for performance, it should mirror the base class's logic
+    public override bool Matches(string encrypted, string candidate)
+    {
+        for (int i = 0; i < encrypted.Length; i++)
+        {
+            char letter = encrypted[i];
+            char candidateMatch = candidate[i];
+            if (char.IsAsciiLetterUpper(letter))
+            {
+                char ringMatch = _cypher[letter - 'A'];
+                if (ringMatch != '-')
+                {
+                    if (ringMatch != candidateMatch) return false;
+                }
+                else if (_usedLetters[candidateMatch - 'A'])
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

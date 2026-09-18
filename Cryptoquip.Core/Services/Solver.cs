@@ -10,7 +10,7 @@ public class Solver
     public void Run(Action<string> logMessage, DecoderRing ring, WordList? wordList, Puzzle puzzle,
         bool enableExclusionAnalysis)
     {
-        _partialSolution = new DecoderRingNull();
+        _partialSolution = ring.Clone();
         
         logMessage($"Received puzzle: {puzzle}");
         logMessage(string.Empty);
@@ -110,7 +110,7 @@ public class Solver
 
         if (ring.SolveCount > _partialSolution.SolveCount)
         {
-            _partialSolution = ring.Clone();
+            _partialSolution.Overwrite(ring);
         }
 		
         Word word = words[depth];
