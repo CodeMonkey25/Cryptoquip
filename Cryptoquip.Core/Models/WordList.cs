@@ -15,10 +15,10 @@ public class WordList
         if (patterns != null && patterns.Count > 0)
         {
             maxPatternLength = 0;
-            foreach (string p in patterns)
+            foreach (string pattern in patterns)
             {
-                lengths.Add(p.Length);
-                if (p.Length > maxPatternLength) maxPatternLength = p.Length;
+                lengths.Add(pattern.Length);
+                if (pattern.Length > maxPatternLength) maxPatternLength = pattern.Length;
             }
         }
         
