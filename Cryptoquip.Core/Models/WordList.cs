@@ -5,39 +5,50 @@ namespace Cryptoquip.Models;
 public class WordList
 {
     private const string DictionaryFileName = @"dictionary.txt";
+    internal const int MaxWordLength = 50;
     private readonly Dictionary<string,List<string>> _words = new();
 
     public WordList(HashSet<string>? patterns = null)
     {
-        HashSet<int> lengths = patterns?.Select(pattern => pattern.Length).ToHashSet() ?? [];
+        HashSet<int> lengths = [];
+        int maxPatternLength = WordList.MaxWordLength;
+        if (patterns != null && patterns.Count > 0)
+        {
+            maxPatternLength = 0;
+            foreach (string p in patterns)
+            {
+                lengths.Add(p.Length);
+                if (p.Length > maxPatternLength) maxPatternLength = p.Length;
+            }
+        }
         
         Parallel.ForEach(
             File.ReadLines(DictionaryFileName),
-            () => (new Dictionary<string, List<string>>(StringComparer.Ordinal), new char[26], new int[26]),
-            (word, _, localState) =>
+            () => new ThreadState(patterns, lengths, maxPatternLength),
+            static (word, _, threadState) =>
             {
-                if (patterns != null && !lengths.Contains(word.Length)) return localState;
+                if (word.Length < 1) return threadState;
+                if (word.Length > threadState.PatternBuffer.Length) return threadState;
+                if (threadState.Patterns != null && !threadState.Lengths.Contains(word.Length)) return threadState;
                 
-                var (localDict, letterBuffer, touchedBuffer) = localState;
-                string pattern = Word.MakePattern(word, letterBuffer, touchedBuffer);
-                if (patterns != null && !patterns.Contains(pattern)) return localState;
+                string pattern = Word.MakePattern(word, threadState.PatternBuffer.AsSpan(0, word.Length), threadState.LetterBuffer, threadState.TouchedBuffer);
+                if (threadState.Patterns != null && !threadState.Patterns.Contains(pattern)) return threadState;
                 
-                if (localDict.TryGetValue(pattern, out List<string>? list))
+                if (threadState.PatternMap.TryGetValue(pattern, out List<string>? list))
                 {
                     list.Add(word);
                 }
                 else
                 {
-                    localDict.Add(pattern, [word,]);
+                    threadState.PatternMap.Add(pattern, [word,]);
                 }
-                return localState;
+                return threadState;
             },
-            (localState) =>
+            (threadState) =>
             {
-                var (localDict, _, _) = localState;
                 lock (_words)
                 {
-                    foreach ((string pattern, List<string> words) in localDict)
+                    foreach ((string pattern, List<string> words) in threadState.PatternMap)
                     {
                         if (_words.TryGetValue(pattern, out List<string>? mainList))
                         {
@@ -112,6 +123,17 @@ public class WordList
         {
             if (ring.Matches(word.Text, w)) matches.Add(w);
         }
+        matches.TrimExcess();
         return matches;
+    }
+    
+    private class ThreadState(IReadOnlySet<string>? patterns, HashSet<int> lengths, int maxPatternLength)
+    {
+        public readonly IReadOnlySet<string>? Patterns = patterns;
+        public readonly HashSet<int> Lengths = lengths;
+        public readonly Dictionary<string, List<string>> PatternMap = new(StringComparer.Ordinal);
+        public readonly char[] PatternBuffer = new char[maxPatternLength];
+        public readonly char[] LetterBuffer = new char[26];
+        public readonly int[] TouchedBuffer = new int[26];
     }
 }

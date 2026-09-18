@@ -18,42 +18,46 @@ public class Word
         LetterMask = MakeTextLetterMask(text);
     }
 
-    public static string MakePattern(string text) => MakePattern(text, new char[26], new int[26]);
-
-    public static string MakePattern(string text, char[] letterBuffer, int[] touchedBuffer)
+    public static string MakePattern(string text)
     {
-        return string.Create(text.Length, (text, letterBuffer, touchedBuffer), static (chars, state) =>
+        Span<char> patternBuffer = text.Length <= WordList.MaxWordLength ? stackalloc char[text.Length] : new char[text.Length];
+        Span<char> letterBuffer = stackalloc char[26];
+        Span<int> touchedBuffer = stackalloc int[26];
+        return MakePattern(text, patternBuffer, letterBuffer, touchedBuffer);
+    }
+
+    public static string MakePattern(string text, Span<char> patternBuffer, Span<char> letterBuffer, Span<int> touchedBuffer)
+    {
+        int patternDepth = 0;
+        for (int i = 0; i < text.Length; i++)
         {
-            var (source, map, touched) = state;
-            int patternDepth = 0;
-            for (int i = 0; i < source.Length; i++)
+            char c = text[i];
+            if (!char.IsAsciiLetterUpper(c))
             {
-                char c = source[i];
-                if (!char.IsAsciiLetterUpper(c))
-                {
-                    chars[i] = c;
-                    continue;
-                }
-
-                int patternIndex = c - 'A';
-                char match = map[patternIndex];
-                if (match != '\0')
-                {
-                    chars[i] = match;
-                    continue;
-                }
-                match = (char)('A' + patternDepth);
-                touched[patternDepth] = patternIndex;
-                patternDepth++;
-                map[patternIndex] = match;
-                chars[i] = match;
+                patternBuffer[i] = c;
+                continue;
             }
 
-            for (int i = 0; i < patternDepth; i++)
+            int patternIndex = c - 'A';
+            char match = letterBuffer[patternIndex];
+            if (match != '\0')
             {
-                map[touched[i]] = '\0';
+                patternBuffer[i] = match;
+                continue;
             }
-        });
+            match = (char)('A' + patternDepth);
+            touchedBuffer[patternDepth] = patternIndex;
+            patternDepth++;
+            letterBuffer[patternIndex] = match;
+            patternBuffer[i] = match;
+        }
+
+        for (int i = 0; i < patternDepth; i++)
+        {
+            letterBuffer[touchedBuffer[i]] = '\0';
+        }
+
+        return new string(patternBuffer);
     }
 
     private static uint MakeTextLetterMask(string text)
