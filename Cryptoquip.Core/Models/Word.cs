@@ -13,17 +13,17 @@ public class Word
     public Word(string text)
     {
         Text = text;
-        Pattern = MakePattern(text);
+        Pattern = MakePattern(text, new char[26], new int[26]);
         Matches = [];
         LetterMask = MakeTextLetterMask(text);
     }
 
-    public static string MakePattern(string text)
+    public static string MakePattern(string text, char[] letterBuffer, int[] touchedBuffer)
     {
-        return string.Create(text.Length, text, static (chars, source) =>
+        return string.Create(text.Length, (text, letterBuffer, touchedBuffer), static (chars, state) =>
         {
+            var (source, map, touched) = state;
             int patternDepth = 0;
-            Span<char> patternMap = stackalloc char[26];
             for (int i = 0; i < source.Length; i++)
             {
                 char c = source[i];
@@ -34,16 +34,22 @@ public class Word
                 }
 
                 int patternIndex = c - 'A';
-                char match = patternMap[patternIndex];
+                char match = map[patternIndex];
                 if (match != '\0')
                 {
                     chars[i] = match;
                     continue;
                 }
                 match = (char)('A' + patternDepth);
+                touched[patternDepth] = patternIndex;
                 patternDepth++;
-                patternMap[patternIndex] = match;
+                map[patternIndex] = match;
                 chars[i] = match;
+            }
+
+            for (int i = 0; i < patternDepth; i++)
+            {
+                map[touched[i]] = '\0';
             }
         });
     }

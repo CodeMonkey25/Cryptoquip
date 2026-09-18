@@ -13,13 +13,14 @@ public class WordList
         
         Parallel.ForEach(
             File.ReadLines(DictionaryFileName),
-            () => new Dictionary<string, List<string>>(StringComparer.Ordinal),
-            (word, _, localDict) =>
+            () => (new Dictionary<string, List<string>>(StringComparer.Ordinal), new char[26], new int[26]),
+            (word, _, localState) =>
             {
-                if (patterns != null && !lengths.Contains(word.Length)) return localDict;
+                var (localDict, letterBuffer, touchedBuffer) = localState;
+                if (patterns != null && !lengths.Contains(word.Length)) return (localDict, letterBuffer, touchedBuffer);
                 
-                string pattern = Word.MakePattern(word);
-                if (patterns != null && !patterns.Contains(pattern)) return localDict;
+                string pattern = Word.MakePattern(word, letterBuffer, touchedBuffer);
+                if (patterns != null && !patterns.Contains(pattern)) return (localDict, letterBuffer, touchedBuffer);
                 
                 if (localDict.TryGetValue(pattern, out List<string>? list))
                 {
@@ -29,10 +30,11 @@ public class WordList
                 {
                     localDict.Add(pattern, [word,]);
                 }
-                return localDict;
+                return (localDict, letterBuffer, touchedBuffer);
             },
-            (localDict) =>
+            (localState) =>
             {
+                var (localDict, _, _) = localState;
                 lock (_words)
                 {
                     foreach ((string pattern, List<string> words) in localDict)
