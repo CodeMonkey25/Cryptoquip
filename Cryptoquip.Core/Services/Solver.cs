@@ -74,7 +74,7 @@ public class Solver
             startIndex++;
         }
 
-        if (!_solveLoop(ring, words, startIndex))
+        if (!SolveRecursively(ring, words.AsSpan(startIndex)))
         {
             logMessage("Could not find a solution. Printing the best attempt.");
             ring.Overwrite(_partialSolution);
@@ -84,17 +84,17 @@ public class Solver
         logMessage(ring.Decode(puzzle.Text));
     }
     
-    private bool _solveLoop(DecoderRing ring, Word[] words, int depth)
+    private bool SolveRecursively(DecoderRing ring, Span<Word> words)
     {
-        // depth exceeds the length of the array, we must have solved it...
-        if (depth >= words.Length) return true;
+        // if words is empty, we must have solved it...
+        if (words.IsEmpty) return true;
 
         if (ring.SolveCount > _partialSolution.SolveCount)
         {
             _partialSolution.Overwrite(ring);
         }
 		
-        Word word = words[depth];
+        Word word = words[0];
         Span<char> candidates = stackalloc char[word.Text.Length];
         int candidateCount = 0;
         foreach(string possibleMatch in word.Matches)
@@ -115,7 +115,7 @@ public class Solver
             }
 
             // recurse, returning if the puzzle is solved...
-            if (_solveLoop(ring, words, depth + 1))
+            if (SolveRecursively(ring, words.Slice(1)))
                 return true;
 
             // remove candidate letter matches
