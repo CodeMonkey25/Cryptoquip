@@ -7,8 +7,17 @@ public abstract class DecoderRing
     protected internal HashSet<char> Hints = [];
     
     public abstract int SolveCount { get; }
-    public abstract void Put(char letter, char match);
     public abstract char Get(char letter);
+    public abstract void Put(char letter, char match);
+
+    public void Put(string letters, string matches)
+    {
+        for (int i = 0; i < letters.Length; i++)
+        {
+            Put(letters[i], matches[i]);
+        }
+    }
+    
     public virtual bool Matches(string encrypted, string candidate)
     {
         for (int i = 0; i < encrypted.Length; i++)

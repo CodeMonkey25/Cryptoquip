@@ -67,6 +67,12 @@ public class Solver
             logMessage($"The word '{words[startIndex].Text}' is unsolvable - skipping this word");
             startIndex++;
         }
+        
+        while (startIndex < words.Length && words[startIndex].Matches.Count == 1)
+        {
+            ring.Put(words[startIndex].Text, words[startIndex].Matches[0]);
+            startIndex++;
+        }
 
         if (!_solveLoop(ring, words, startIndex))
         {
