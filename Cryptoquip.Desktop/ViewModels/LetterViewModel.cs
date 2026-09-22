@@ -64,9 +64,14 @@ public class LetterViewModel : ViewModelBase
         DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
 
         if (decodedLetter == ' ')
+        {
             ring.Remove(Letter);
-        else 
+        }
+        else
+        {
+            if (ring.Contains(Letter)) ring.Remove(Letter);
             ring.Put(Letter, decodedLetter);
+        }
         
         DecodedLetter = ring.Get(Letter);
         return Unit.Default;
