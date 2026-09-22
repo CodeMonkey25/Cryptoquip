@@ -36,7 +36,7 @@ public class Solver
         
         if (!enableExclusionAnalysis)
         {
-            words = words.OrderBy(static w => w.Matches.Count).ThenByDescending(static w => w.Text.Length).ToArray();
+            words.Sort();
         }
         
         foreach (Word word in words)
@@ -54,7 +54,7 @@ public class Solver
             int deleted = exclusionAnalysis.Run(words);
             logMessage("Deleted " + deleted + " words...");
 
-            words = words.OrderBy(static w => w.Matches.Count).ThenByDescending(static w => w.Text.Length).ToArray();
+            words.Sort();
             foreach (Word word in words)
             {
                 logMessage("\t" + word.Text + " (" + word.Matches.Count + ")");
