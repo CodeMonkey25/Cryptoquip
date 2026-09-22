@@ -70,10 +70,12 @@ public abstract class DecoderRing
     
     public virtual IEnumerable<char> GetUnusedLetters()
     {
-        return Enumerable.Range(0, 26)
-            .Select(static i => (char)('A' + i))
-            .Except(GetUsedLetters())
-            .ToArray();
+        bool[] used = new bool[26];
+        foreach (char c in GetUsedLetters())
+            used[c - 'A'] = true;
+
+        for (int i = 0; i < 26; i++)
+            if (!used[i]) yield return (char)('A' + i);
     }
     
     public virtual bool WasSetFromHint(char letter)
