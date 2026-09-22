@@ -10,11 +10,13 @@ public abstract class DecoderRing
     public abstract char Get(char letter);
     public abstract void Put(char letter, char match);
 
-    public void Put(string letters, string matches)
+    public void Put(string letters, string matches, List<char>? addedLetters = null)
     {
         for (int i = 0; i < letters.Length; i++)
         {
+            if (Contains(letters[i])) continue;
             Put(letters[i], matches[i]);
+            addedLetters?.Add(letters[i]);
         }
     }
     

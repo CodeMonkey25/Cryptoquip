@@ -74,7 +74,7 @@ public class Solver
             startIndex++;
         }
 
-        if (!SolveRecursively(ring, words.AsSpan(startIndex)))
+        if (!SolveIteratively(ring, words.AsSpan(startIndex)))
         {
             logMessage("Could not find a solution. Printing the best attempt.");
             ring.Overwrite(_partialSolution);
@@ -127,5 +127,50 @@ public class Solver
         }
 		
         return false;
+    }
+
+    private bool SolveIteratively(DecoderRing ring, Span<Word> words)
+    {
+        int depth = 0;
+        
+        Span<int> matchIndex = stackalloc int[words.Length];
+        Span<List<char>> candidates = new List<char>[words.Length];
+        for (int i = 0; i < words.Length; i++)
+        {
+            matchIndex[i] = 0;
+            candidates[i] = new List<char>(26);
+        }
+        
+        while (depth >= 0 && depth < words.Length)
+        {
+            foreach (char c in candidates[depth])
+            {
+                ring.Remove(c);
+            }
+            candidates[depth].Clear();
+
+            while (matchIndex[depth] < words[depth].Matches.Count && !ring.Matches(words[depth].Text, words[depth].Matches[matchIndex[depth]]))
+            {
+                matchIndex[depth]++;
+            }
+
+            if (matchIndex[depth] >= words[depth].Matches.Count)
+            {
+                matchIndex[depth] = 0;
+                depth--;
+                continue;
+            }
+
+            ring.Put(words[depth].Text, words[depth].Matches[matchIndex[depth]], candidates[depth]);
+            matchIndex[depth]++;
+            depth++;
+            
+            if (ring.SolveCount > _partialSolution.SolveCount)
+            {
+                _partialSolution.Overwrite(ring);
+            }
+        }
+
+        return depth >= 0;
     }
 }
