@@ -135,35 +135,35 @@ public class Solver
         
         Span<int> matchIndex = words.Length <= 100 ? stackalloc int[words.Length] : new int[words.Length];
         Span<int> candidatesCount = words.Length <= 100 ? stackalloc int[words.Length] : new int[words.Length];
-        Span<char[]> candidates = new char[words.Length][];
-        for (int i = 0; i < words.Length; i++)
-        {
-            matchIndex[i] = 0;
-            candidatesCount[i] = 0;
-            candidates[i] = new char[26];
-        }
+        Span<char> candidateBuffer = words.Length * 26 <= 4096
+            ? stackalloc char[words.Length * 26]
+            : new char[words.Length * 26];
         
         while (depth >= 0 && depth < words.Length)
         {
+            Span<char> candidates = candidateBuffer.Slice(depth * 26, 26);
+            Word word = words[depth];
+            List<string> matches = word.Matches;
+            
             for (int i = 0; i < candidatesCount[depth]; i++)
             {
-                ring.Remove(candidates[depth][i]);
+                ring.Remove(candidates[i]);
             }
             candidatesCount[depth] = 0;
 
-            while (matchIndex[depth] < words[depth].Matches.Count && !ring.Matches(words[depth].Text, words[depth].Matches[matchIndex[depth]]))
+            while (matchIndex[depth] < matches.Count && !ring.Matches(word.Text, matches[matchIndex[depth]]))
             {
                 matchIndex[depth]++;
             }
 
-            if (matchIndex[depth] >= words[depth].Matches.Count)
+            if (matchIndex[depth] >= matches.Count)
             {
                 matchIndex[depth] = 0;
                 depth--;
                 continue;
             }
 
-            candidatesCount[depth] = ring.Put(words[depth].Text, words[depth].Matches[matchIndex[depth]], candidates[depth]);
+            candidatesCount[depth] = ring.Put(word.Text, matches[matchIndex[depth]], candidates);
             matchIndex[depth]++;
             depth++;
             

@@ -10,14 +10,14 @@ public abstract class DecoderRing
     public abstract char Get(char letter);
     public abstract void Put(char letter, char match);
 
-    public int Put(string letters, string matches, char[]? addedLetters = null)
+    public int Put(string letters, string matches, Span<char> addedLetters = default)
     {
         int count = 0;
         for (int i = 0; i < letters.Length; i++)
         {
             if (Contains(letters[i])) continue;
             Put(letters[i], matches[i]);
-            if (addedLetters != null) addedLetters[count] = letters[i];
+            if (!addedLetters.IsEmpty) addedLetters[count] = letters[i];
             count++;
         }
         return count;
