@@ -1,4 +1,6 @@
-﻿namespace Cryptoquip.Services;
+﻿using System.Runtime.CompilerServices;
+
+namespace Cryptoquip.Services;
 
 public sealed class DecoderRingArray : DecoderRing
 {
@@ -8,6 +10,7 @@ public sealed class DecoderRingArray : DecoderRing
 
     public override int SolveCount => _solveCount;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void Put(char letter, char match)
     {
         if (char.IsAsciiLetterUpper(letter))
@@ -22,6 +25,7 @@ public sealed class DecoderRingArray : DecoderRing
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override char Get(char letter)
     {
         if (char.IsAsciiLetterUpper(letter))
@@ -33,6 +37,7 @@ public sealed class DecoderRingArray : DecoderRing
         return letter;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void Remove(char letter)
     {
         if (char.IsAsciiLetterUpper(letter))
@@ -49,6 +54,7 @@ public sealed class DecoderRingArray : DecoderRing
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Contains(char letter)
     {
         if (char.IsAsciiLetterUpper(letter))
@@ -69,11 +75,9 @@ public sealed class DecoderRingArray : DecoderRing
         }
     }
     
-    public override bool UsedContains(char letter)
-    {
-        return _usedLetters[letter - 'A'];
-    }
-    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override bool UsedContains(char letter) => _usedLetters[letter - 'A'];
+
     public override void Clear()
     {
         Array.Fill(_cypher, '-');
