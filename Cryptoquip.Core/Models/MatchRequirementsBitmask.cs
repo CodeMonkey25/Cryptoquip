@@ -1,10 +1,13 @@
-﻿namespace Cryptoquip.Models;
+﻿using System.Runtime.CompilerServices;
+
+namespace Cryptoquip.Models;
 
 public sealed class MatchRequirementsBitmask : MatchRequirements
 {
     // Bit i (0..25) is set if ('A' + i) is an allowed plain character
     private readonly uint[] _allowedMasks = new uint[26];
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected override void RegisterMatch(string text, string match)
     {
         for (int i = 0; i < match.Length; i++)
@@ -19,6 +22,7 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Matches(string text, string match)
     {
         for (int i = 0; i < match.Length; i++)
@@ -36,8 +40,6 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
         return true;
     }
     
-    public override void Clear()
-    {
-        Array.Clear(_allowedMasks);
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public override void Clear() => Array.Clear(_allowedMasks);
 }
