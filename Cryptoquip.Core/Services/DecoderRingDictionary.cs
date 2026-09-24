@@ -18,7 +18,11 @@ public sealed class DecoderRingDictionary : DecoderRing
         return !char.IsAsciiLetterUpper(letter) ? letter : _map.GetValueOrDefault(letter, '-');
     }
 
-    public override IEnumerable<(char letter, char match)> GetMatches() => _map.Select(static entry => (entry.Key, entry.Value));
+    public override IEnumerable<(char letter, char match)> GetMatches()
+    {
+        foreach (var kvp in _map)
+            yield return (kvp.Key, kvp.Value);
+    }
 
     public override void Remove(char letter)
     {
