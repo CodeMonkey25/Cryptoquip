@@ -10,14 +10,17 @@ public abstract class DecoderRing
     public abstract char Get(char letter);
     public abstract void Put(char letter, char match);
 
-    public void Put(string letters, string matches, List<char>? addedLetters = null)
+    public int Put(string letters, string matches, char[]? addedLetters = null)
     {
+        int count = 0;
         for (int i = 0; i < letters.Length; i++)
         {
             if (Contains(letters[i])) continue;
             Put(letters[i], matches[i]);
-            addedLetters?.Add(letters[i]);
+            if (addedLetters != null) addedLetters[count] = letters[i];
+            count++;
         }
+        return count;
     }
     
     public virtual bool Matches(string encrypted, string candidate)

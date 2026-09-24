@@ -133,21 +133,23 @@ public class Solver
     {
         int depth = 0;
         
-        Span<int> matchIndex = stackalloc int[words.Length];
-        Span<List<char>> candidates = new List<char>[words.Length];
+        Span<int> matchIndex = words.Length <= 100 ? stackalloc int[words.Length] : new int[words.Length];
+        Span<int> candidatesCount = words.Length <= 100 ? stackalloc int[words.Length] : new int[words.Length];
+        Span<char[]> candidates = new char[words.Length][];
         for (int i = 0; i < words.Length; i++)
         {
             matchIndex[i] = 0;
-            candidates[i] = new List<char>(26);
+            candidatesCount[i] = 0;
+            candidates[i] = new char[26];
         }
         
         while (depth >= 0 && depth < words.Length)
         {
-            foreach (char c in candidates[depth])
+            for (int i = 0; i < candidatesCount[depth]; i++)
             {
-                ring.Remove(c);
+                ring.Remove(candidates[depth][i]);
             }
-            candidates[depth].Clear();
+            candidatesCount[depth] = 0;
 
             while (matchIndex[depth] < words[depth].Matches.Count && !ring.Matches(words[depth].Text, words[depth].Matches[matchIndex[depth]]))
             {
@@ -161,7 +163,7 @@ public class Solver
                 continue;
             }
 
-            ring.Put(words[depth].Text, words[depth].Matches[matchIndex[depth]], candidates[depth]);
+            candidatesCount[depth] = ring.Put(words[depth].Text, words[depth].Matches[matchIndex[depth]], candidates[depth]);
             matchIndex[depth]++;
             depth++;
             
