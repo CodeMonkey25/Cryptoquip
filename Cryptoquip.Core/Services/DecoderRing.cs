@@ -8,6 +8,7 @@ public abstract class DecoderRing
     
     public abstract int SolveCount { get; }
     public abstract char Get(char letter);
+    public abstract IEnumerable<(char letter, char match)> GetMatches();
     public abstract void Put(char letter, char match);
 
     public int Put(string letters, string matches, Span<char> addedLetters = default)
@@ -102,9 +103,9 @@ public abstract class DecoderRing
     public virtual void Overwrite(DecoderRing other)
     {
         Clear();
-        foreach (char letter in other.GetUsedLetters())
+        foreach (var (letter, match) in other.GetMatches())
         {
-            Put(letter, other.Get(letter));
+            Put(letter, match);
         }
         foreach (char hint in other.Hints)
         {

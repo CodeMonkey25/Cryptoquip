@@ -14,7 +14,7 @@ class Program
      
         Stopwatch watch = Stopwatch.StartNew();
         
-        DecoderRing ring = new DecoderRingArray();
+        DecoderRing ring = new DecoderRingBitmask();
         Puzzle puzzle = new(text, ring);
         WordList? wordList = null;
         Solver solver = new();

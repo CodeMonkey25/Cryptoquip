@@ -5,6 +5,7 @@ public sealed class DecoderRingNull : DecoderRing
     public override int SolveCount => 0;
     public override void Put(char letter, char match) { }
     public override char Get(char letter) => '-';
+    public override IEnumerable<(char letter, char match)> GetMatches() => [];
     public override bool Matches(string encrypted, string candidate) => true;
     public override void LoadHints(ReadOnlyMemory<char> hints) { }
     public override string Decode(ReadOnlyMemory<char> message) => new('-', message.Length);
