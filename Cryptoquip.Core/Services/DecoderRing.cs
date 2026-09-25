@@ -16,6 +16,7 @@ public abstract class DecoderRing
         int count = 0;
         for (int i = 0; i < letters.Length; i++)
         {
+            if (!char.IsAsciiLetterUpper(letters[i])) continue;
             if (Contains(letters[i])) continue;
             Put(letters[i], matches[i]);
             if (!addedLetters.IsEmpty) addedLetters[count] = letters[i];
@@ -73,6 +74,15 @@ public abstract class DecoderRing
     public virtual string Decode(ReadOnlyMemory<char> message) => string.Concat(message.Select(Get));
     
     public abstract void Remove(char letter);
+
+    public virtual void Remove(Span<char> letters)
+    {
+        foreach (char letter in letters)
+        {
+            Remove(letter);
+        }
+    }
+    
     public abstract bool Contains(char letter);
     public abstract bool UsedContains(char letter);
 

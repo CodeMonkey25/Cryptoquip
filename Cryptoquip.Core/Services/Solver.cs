@@ -96,34 +96,18 @@ public class Solver
 		
         Word word = words[0];
         Span<char> candidates = stackalloc char[word.Text.Length];
-        int candidateCount = 0;
         foreach(string possibleMatch in word.Matches)
         {
             if (!ring.Matches(word.Text, possibleMatch)) continue;
             
             // add candidate letter matches
-            for (int i = 0; i < word.Text.Length; i++)
-            {
-                char l = word.Text[i];
-                if (!char.IsAsciiLetterUpper(l)) continue;
-                if (ring.Contains(l)) continue;
-
-                char m = possibleMatch[i];
-                ring.Put(l, m);
-                candidates[candidateCount] = l;
-                candidateCount++;
-            }
+            int candidateCount = ring.Put(word.Text, possibleMatch, candidates);
 
             // recurse, returning if the puzzle is solved...
-            if (SolveRecursively(ring, words.Slice(1)))
-                return true;
+            if (SolveRecursively(ring, words.Slice(1))) return true;
 
             // remove candidate letter matches
-            for (int i = 0; i < candidateCount; i++)
-            {
-                ring.Remove(candidates[i]);
-            }
-            candidateCount = 0;
+            ring.Remove(candidates.Slice(0, candidateCount));
         }
 		
         return false;
@@ -133,38 +117,34 @@ public class Solver
     {
         int depth = 0;
         
-        Span<int> matchIndex = words.Length <= 100 ? stackalloc int[words.Length] : new int[words.Length];
+        Span<int> matchesIndex = words.Length <= 100 ? stackalloc int[words.Length] : new int[words.Length];
         Span<int> candidatesCount = words.Length <= 100 ? stackalloc int[words.Length] : new int[words.Length];
-        Span<char> candidateBuffer = words.Length * 26 <= 4096
+        Span<char> candidatesBuffer = words.Length * 26 <= 4096
             ? stackalloc char[words.Length * 26]
             : new char[words.Length * 26];
         
         while (depth >= 0 && depth < words.Length)
         {
-            Span<char> candidates = candidateBuffer.Slice(depth * 26, 26);
+            Span<char> candidates = candidatesBuffer.Slice(depth * 26, 26);
             Word word = words[depth];
             List<string> matches = word.Matches;
-            
-            for (int i = 0; i < candidatesCount[depth]; i++)
-            {
-                ring.Remove(candidates[i]);
-            }
-            candidatesCount[depth] = 0;
 
-            while (matchIndex[depth] < matches.Count && !ring.Matches(word.Text, matches[matchIndex[depth]]))
+            ring.Remove(candidates.Slice(0, candidatesCount[depth]));
+
+            while (matchesIndex[depth] < matches.Count && !ring.Matches(word.Text, matches[matchesIndex[depth]]))
             {
-                matchIndex[depth]++;
+                matchesIndex[depth]++;
             }
 
-            if (matchIndex[depth] >= matches.Count)
+            if (matchesIndex[depth] >= matches.Count)
             {
-                matchIndex[depth] = 0;
+                matchesIndex[depth] = 0;
                 depth--;
                 continue;
             }
 
-            candidatesCount[depth] = ring.Put(word.Text, matches[matchIndex[depth]], candidates);
-            matchIndex[depth]++;
+            candidatesCount[depth] = ring.Put(word.Text, matches[matchesIndex[depth]], candidates);
+            matchesIndex[depth]++;
             depth++;
             
             if (ring.SolveCount > _partialSolution.SolveCount)
