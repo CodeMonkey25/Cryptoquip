@@ -129,7 +129,7 @@ public class Solver
             Word word = words[depth];
             List<string> matches = word.Matches;
 
-            ring.Remove(candidates.Slice(0, candidatesCount[depth]));
+            if (candidatesCount[depth] > 0) ring.Remove(candidates.Slice(0, candidatesCount[depth]));
 
             while (matchesIndex[depth] < matches.Count && !ring.Matches(word.Text, matches[matchesIndex[depth]]))
             {
