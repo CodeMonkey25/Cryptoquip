@@ -4,13 +4,9 @@ namespace Cryptoquip.Services;
 
 public class Solver
 {
-    private DecoderRing _partialSolution = new DecoderRingNull();
-    
     public void Run(Action<string> logMessage, DecoderRing ring, WordList? wordList, Puzzle puzzle,
         bool enableExclusionAnalysis)
     {
-        _partialSolution = ring.Clone();
-        
         logMessage($"Received puzzle: {puzzle}");
         logMessage(string.Empty);
         
@@ -72,24 +68,25 @@ public class Solver
             startIndex++;
         }
 
-        if (!SolveIteratively(ring, words.AsSpan(startIndex)))
+        DecoderRing partialSolution = ring.Clone();
+        if (!SolveIteratively(words.AsSpan(startIndex), ring, partialSolution))
         {
             logMessage("Could not find a solution. Printing the best attempt.");
-            ring.Overwrite(_partialSolution);
+            ring.Overwrite(partialSolution);
         }
 
         logMessage(string.Empty);
         logMessage(ring.Decode(puzzle.Text));
     }
     
-    private bool SolveRecursively(DecoderRing ring, Span<Word> words)
+    private bool SolveRecursively(Span<Word> words, DecoderRing ring, DecoderRing partialSolution)
     {
         // if words is empty, we must have solved it...
         if (words.IsEmpty) return true;
 
-        if (ring.SolveCount > _partialSolution.SolveCount)
+        if (ring.SolveCount > partialSolution.SolveCount)
         {
-            _partialSolution.Overwrite(ring);
+            partialSolution.Overwrite(ring);
         }
 		
         Word word = words[0];
@@ -102,7 +99,7 @@ public class Solver
             int candidateCount = ring.Put(word.Text, possibleMatch, candidates);
 
             // recurse, returning if the puzzle is solved...
-            if (SolveRecursively(ring, words.Slice(1))) return true;
+            if (SolveRecursively(words.Slice(1), ring, partialSolution)) return true;
 
             // remove candidate letter matches
             ring.Remove(candidates.Slice(0, candidateCount));
@@ -111,7 +108,7 @@ public class Solver
         return false;
     }
 
-    private bool SolveIteratively(DecoderRing ring, Span<Word> words)
+    private bool SolveIteratively(Span<Word> words, DecoderRing ring, DecoderRing partialSolution)
     {
         int depth = 0;
         
@@ -145,9 +142,9 @@ public class Solver
             matchesIndex[depth]++;
             depth++;
             
-            if (ring.SolveCount > _partialSolution.SolveCount)
+            if (ring.SolveCount > partialSolution.SolveCount)
             {
-                _partialSolution.Overwrite(ring);
+                partialSolution.Overwrite(ring);
             }
         }
 
