@@ -14,11 +14,12 @@ public abstract class DecoderRing
     public int Put(ReadOnlySpan<char> letters, ReadOnlySpan<char> matches, Span<char> addedLetters = default)
     {
         int count = 0;
+        bool trackAdded = !addedLetters.IsEmpty;
         for (int i = 0; i < letters.Length; i++)
         {
             bool added = Put(letters[i], matches[i]);
             if (!added) continue;
-            if (!addedLetters.IsEmpty) addedLetters[count] = letters[i];
+            if (trackAdded) addedLetters[count] = letters[i];
             count++;
         }
         return count;
