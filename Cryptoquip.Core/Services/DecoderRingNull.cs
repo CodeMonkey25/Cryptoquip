@@ -3,7 +3,7 @@
 public sealed class DecoderRingNull : DecoderRing
 {
     public override int SolveCount => 0;
-    public override void Put(char letter, char match) { }
+    public override bool Put(char letter, char match) => false;
     public override char Get(char letter) => '-';
     public override IEnumerable<(char letter, char match)> GetMatches() => [];
     public override bool Matches(string encrypted, string candidate) => true;

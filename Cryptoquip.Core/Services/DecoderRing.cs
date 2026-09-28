@@ -9,16 +9,15 @@ public abstract class DecoderRing
     public abstract int SolveCount { get; }
     public abstract char Get(char letter);
     public abstract IEnumerable<(char letter, char match)> GetMatches();
-    public abstract void Put(char letter, char match);
+    public abstract bool Put(char letter, char match);
 
-    public int Put(string letters, string matches, Span<char> addedLetters = default)
+    public int Put(ReadOnlySpan<char> letters, ReadOnlySpan<char> matches, Span<char> addedLetters = default)
     {
         int count = 0;
         for (int i = 0; i < letters.Length; i++)
         {
-            if (!char.IsAsciiLetterUpper(letters[i])) continue;
-            if (Contains(letters[i])) continue;
-            Put(letters[i], matches[i]);
+            bool added = Put(letters[i], matches[i]);
+            if (!added) continue;
             if (!addedLetters.IsEmpty) addedLetters[count] = letters[i];
             count++;
         }

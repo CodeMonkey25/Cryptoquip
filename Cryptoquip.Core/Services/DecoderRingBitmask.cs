@@ -13,19 +13,21 @@ public sealed class DecoderRingBitmask : DecoderRing
     public override int SolveCount => _solveCount;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override void Put(char letter, char match)
+    public override bool Put(char letter, char match)
     {
-        if (char.IsAsciiLetterUpper(letter))
-        {
-            int i = letter - 'A';
-            _cypher[i] = match;
-            _mappedLetters |= 1u << i;
+        if (!char.IsAsciiLetterUpper(letter)) return false;
+        if (!char.IsAsciiLetterUpper(match)) return false;
+        
+        int i = letter - 'A';
+        if ((_mappedLetters & (1u << i)) != 0) return false; // is letter already mapped?
+        _cypher[i] = match;
+        _mappedLetters |= 1u << i;
 
-            i = match - 'A';
-            _usedLetters |= 1u << i;
+        i = match - 'A';
+        _usedLetters |= 1u << i;
 
-            _solveCount++;
-        }
+        _solveCount++;
+        return true;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -93,7 +95,7 @@ public sealed class DecoderRingBitmask : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool UsedContains(char letter) => (_usedLetters & (1u << (letter - 'A'))) != 0;
+    public override bool UsedContains(char letter) => char.IsAsciiLetterUpper(letter) && (_usedLetters & (1u << (letter - 'A'))) != 0;
 
     public override void Clear()
     {

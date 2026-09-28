@@ -5,12 +5,11 @@ public sealed class DecoderRingDictionary : DecoderRing
     private Dictionary<char, char> _map = new();
     public override int SolveCount => _map.Count;
 
-    public override void Put(char letter, char match)
+    public override bool Put(char letter, char match)
     {
-        if (char.IsAsciiLetterUpper(letter))
-        {
-            _map[letter] = match;
-        }
+        if (!char.IsAsciiLetterUpper(letter)) return false;
+        if (!char.IsAsciiLetterUpper(match)) return false;
+        return _map.TryAdd(letter, match);
     }
 	
     public override char Get(char letter)
