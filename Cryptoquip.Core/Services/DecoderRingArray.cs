@@ -13,15 +13,13 @@ public sealed class DecoderRingArray : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Put(char letter, char match)
     {
-        if (!char.IsAsciiLetterUpper(letter)) return false;
-        if (!char.IsAsciiLetterUpper(match)) return false;
+        uint l = (uint)(letter - 'A');
+        uint m = (uint)(match - 'A');
+        if (l >= 26u || m >= 26u) return false;
         
-        int i = letter - 'A';
-        if (_cypher[i] != '-') return false; // is letter already mapped?
-        _cypher[i] = match;
-
-        i = match - 'A';
-        _usedLetters[i] = true;
+        if (_cypher[l] != '-') return false; // is letter already mapped?
+        _cypher[l] = match;
+        _usedLetters[m] = true;
 
         _solveCount++;
         return true;
@@ -30,13 +28,8 @@ public sealed class DecoderRingArray : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override char Get(char letter)
     {
-        if (char.IsAsciiLetterUpper(letter))
-        {
-            int i = letter - 'A';
-            return _cypher[i];
-        }
-
-        return letter;
+        uint i = (uint)(letter - 'A');
+        return i < 26u ? _cypher[i] : letter;
     }
 
     public override IEnumerable<(char letter, char match)> GetMatches()
@@ -49,15 +42,18 @@ public sealed class DecoderRingArray : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void Remove(char letter)
     {
-        if (char.IsAsciiLetterUpper(letter))
+        uint i = (uint)(letter - 'A');
+        if (i < 26u)
         {
-            int i = letter - 'A';
             char match = _cypher[i];
             if (match != '-')
             {
                 _cypher[i] = '-';
-                i = match - 'A';
-                _usedLetters[i] = false;
+                uint m = (uint)(match - 'A');
+                if (m < 26u)
+                {
+                    _usedLetters[m] = false;
+                }
                 _solveCount--;
             }
         }
@@ -66,13 +62,8 @@ public sealed class DecoderRingArray : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Contains(char letter)
     {
-        if (char.IsAsciiLetterUpper(letter))
-        {
-            int i = letter - 'A';
-            return _cypher[i] != '-';
-        }
-
-        return false;
+        uint i = (uint)(letter - 'A');
+        return i < 26u && _cypher[i] != '-';
     }
 
     public override IEnumerable<char> GetUsedLetters()
@@ -85,7 +76,11 @@ public sealed class DecoderRingArray : DecoderRing
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool UsedContains(char letter) => char.IsAsciiLetterUpper(letter) && _usedLetters[letter - 'A'];
+    public override bool UsedContains(char letter)
+    {
+        uint i = (uint)(letter - 'A');
+        return i < 26u && _usedLetters[i];
+    }
 
     public override void Clear()
     {
@@ -128,16 +123,21 @@ public sealed class DecoderRingArray : DecoderRing
         {
             char letter = encrypted[i];
             char candidateMatch = candidate[i];
-            if (char.IsAsciiLetterUpper(letter))
+            uint l = (uint)(letter - 'A');
+            if (l < 26u)
             {
-                char ringMatch = _cypher[letter - 'A'];
+                char ringMatch = _cypher[l];
                 if (ringMatch != '-')
                 {
                     if (ringMatch != candidateMatch) return false;
                 }
-                else if (_usedLetters[candidateMatch - 'A'])
+                else
                 {
-                    return false;
+                    uint c = (uint)(candidateMatch - 'A');
+                    if (c < 26u && _usedLetters[c])
+                    {
+                        return false;
+                    }
                 }
             }
         }

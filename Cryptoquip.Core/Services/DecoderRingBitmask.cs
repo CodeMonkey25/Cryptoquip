@@ -15,16 +15,16 @@ public sealed class DecoderRingBitmask : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Put(char letter, char match)
     {
-        if (!char.IsAsciiLetterUpper(letter)) return false;
-        if (!char.IsAsciiLetterUpper(match)) return false;
+        uint l = (uint)(letter - 'A');
+        uint m = (uint)(match - 'A');
+        if (l >= 26u || m >= 26u) return false;
         
-        int i = letter - 'A';
-        if ((_mappedLetters & (1u << i)) != 0) return false; // is letter already mapped?
-        _cypher[i] = match;
-        _mappedLetters |= 1u << i;
+        uint lBit = 1u << (int)l;
+        if ((_mappedLetters & lBit) != 0) return false; // is letter already mapped?
+        _cypher[l] = match;
+        _mappedLetters |= lBit;
 
-        i = match - 'A';
-        _usedLetters |= 1u << i;
+        _usedLetters |= 1u << (int)m;
 
         _solveCount++;
         return true;
@@ -33,13 +33,8 @@ public sealed class DecoderRingBitmask : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override char Get(char letter)
     {
-        if (char.IsAsciiLetterUpper(letter))
-        {
-            int i = letter - 'A';
-            return _cypher[i];
-        }
-
-        return letter;
+        uint i = (uint)(letter - 'A');
+        return i < 26u ? _cypher[i] : letter;
     }
 
     public override IEnumerable<(char letter, char match)> GetMatches()
@@ -56,16 +51,20 @@ public sealed class DecoderRingBitmask : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override void Remove(char letter)
     {
-        if (char.IsAsciiLetterUpper(letter))
+        uint i = (uint)(letter - 'A');
+        if (i < 26u)
         {
-            int i = letter - 'A';
-            char match = _cypher[i];
-            if (match != '-')
+            uint lBit = 1u << (int)i;
+            if ((_mappedLetters & lBit) != 0)
             {
+                char match = _cypher[i];
                 _cypher[i] = '-';
-                _mappedLetters &= ~(1u << i);
-                i = match - 'A';
-                _usedLetters &= ~(1u << i);
+                _mappedLetters &= ~lBit;
+                uint m = (uint)(match - 'A');
+                if (m < 26u)
+                {
+                    _usedLetters &= ~(1u << (int)m);
+                }
                 _solveCount--;
             }
         }
@@ -74,13 +73,8 @@ public sealed class DecoderRingBitmask : DecoderRing
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool Contains(char letter)
     {
-        if (char.IsAsciiLetterUpper(letter))
-        {
-            int i = letter - 'A';
-            return (_mappedLetters & (1u << i)) != 0;
-        }
-
-        return false;
+        uint i = (uint)(letter - 'A');
+        return i < 26u && (_mappedLetters & (1u << (int)i)) != 0;
     }
 
     public override IEnumerable<char> GetUsedLetters()
@@ -95,7 +89,11 @@ public sealed class DecoderRingBitmask : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool UsedContains(char letter) => char.IsAsciiLetterUpper(letter) && (_usedLetters & (1u << (letter - 'A'))) != 0;
+    public override bool UsedContains(char letter)
+    {
+        uint i = (uint)(letter - 'A');
+        return i < 26u && (_usedLetters & (1u << (int)i)) != 0;
+    }
 
     public override void Clear()
     {
@@ -141,19 +139,36 @@ public sealed class DecoderRingBitmask : DecoderRing
         {
             char letter = encrypted[i];
             char candidateMatch = candidate[i];
-            if (char.IsAsciiLetterUpper(letter))
+            uint l = (uint)(letter - 'A');
+            if (l < 26u)
             {
-                char ringMatch = _cypher[letter - 'A'];
+                char ringMatch = _cypher[l];
                 if (ringMatch != '-')
                 {
                     if (ringMatch != candidateMatch) return false;
                 }
-                else if ((_usedLetters & (1u << (candidateMatch - 'A'))) != 0)
+                else
                 {
-                    return false;
+                    uint c = (uint)(candidateMatch - 'A');
+                    if (c < 26u && (_usedLetters & (1u << (int)c)) != 0)
+                    {
+                        return false;
+                    }
                 }
             }
         }
         return true;
+    }
+    
+    // overriding this for performance, it should mirror the base class's logic
+    public override IEnumerable<char> GetUnusedLetters()
+    {
+        uint unused = ~_usedLetters & 0x03FFFFFFu;
+        while (unused != 0)
+        {
+            int i = BitOperations.TrailingZeroCount(unused);
+            yield return (char)('A' + i);
+            unused &= unused - 1;
+        }
     }
 }
