@@ -75,6 +75,15 @@ public sealed class DecoderRingArray : DecoderRing
         }
     }
     
+    public override IEnumerable<char> GetUnusedLetters()
+    {
+        for (int i = 0; i < _usedLetters.Length; i++)
+        {
+            if (!_usedLetters[i])
+                yield return (char)('A' + i);
+        }
+    }
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override bool UsedContains(char letter)
     {
