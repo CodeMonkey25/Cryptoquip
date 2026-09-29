@@ -126,7 +126,7 @@ public sealed class DecoderRingArray : DecoderRing
     }
     
     // overriding this for performance, it should mirror the base class's logic
-    public override bool Matches(string encrypted, string candidate)
+    public override bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
     {
         for (int i = 0; i < encrypted.Length; i++)
         {

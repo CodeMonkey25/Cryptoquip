@@ -25,7 +25,7 @@ public abstract class DecoderRing
         return count;
     }
     
-    public virtual bool Matches(string encrypted, string candidate)
+    public virtual bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
     {
         for (int i = 0; i < encrypted.Length; i++)
         {
