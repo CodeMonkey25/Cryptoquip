@@ -51,7 +51,7 @@ public abstract class DecoderRing
         return true;
     }
 
-    public virtual void LoadHints(ReadOnlyMemory<char> hints)
+    public void LoadHints(ReadOnlyMemory<char> hints)
     {
         foreach (ReadOnlyMemory<char> hint in hints.Split(',').Select(static h => h.Trim()))
         {
@@ -68,7 +68,7 @@ public abstract class DecoderRing
         }
     }
 
-    public virtual string Decode(ReadOnlyMemory<char> message) => string.Concat(message.Select(Get));
+    public string Decode(ReadOnlyMemory<char> message) => string.Concat(message.Select(Get));
     
     public abstract void Remove(char letter);
 
@@ -100,7 +100,7 @@ public abstract class DecoderRing
             if (!used[i]) yield return (char)('A' + i);
     }
     
-    public virtual bool WasSetFromHint(char letter)
+    public bool WasSetFromHint(char letter)
     {
         return Hints.Contains(letter);
     }
