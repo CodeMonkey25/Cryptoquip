@@ -69,7 +69,7 @@ public class Solver
         }
 
         DecoderRing partialSolution = ring.Clone();
-        if (!SolveIteratively(words.AsSpan(startIndex), ring, partialSolution))
+        if (!SolveRecursively(words.AsSpan(startIndex), ring, partialSolution))
         {
             logMessage("Could not find a solution. Printing the best attempt.");
             ring.Overwrite(partialSolution);
