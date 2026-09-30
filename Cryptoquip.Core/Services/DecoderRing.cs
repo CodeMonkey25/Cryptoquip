@@ -1,4 +1,5 @@
 ﻿using Cryptoquip.Extensions;
+using Cryptoquip.Models;
 
 namespace Cryptoquip.Services;
 
@@ -57,12 +58,12 @@ public abstract class DecoderRing
         {
             ReadOnlyMemory<char>[] parts = hint.Split('=').Select(static h => h.Trim()).ToArray();
             if (parts.Length != 2) continue;
-            if (parts[0].Length != parts[1].Length) continue;
-
-            for(int i = 0; i < parts[0].Length; i++)
+            
+            (ReadOnlyMemory<char> word, ReadOnlyMemory<char> match) = (parts[0], parts[1]);
+            if (word.Length != match.Length) continue;
+            
+            foreach ((char c1, char c2) in word.Zip(match))
             {
-                char c1 = parts[0].Span[i];
-                char c2 = parts[1].Span[i];
                 if (Put(c1, c2)) Hints.Add(c1);
             }
         }

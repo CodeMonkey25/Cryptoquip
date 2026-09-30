@@ -61,4 +61,22 @@ public static class ReadOnlyMemoryExtensions
             yield return selector(source.Span[i]);
         }
     }
+
+    public static IEnumerable<(TFirst First, TSecond Second)> Zip<TFirst, TSecond>(this ReadOnlyMemory<TFirst> first, ReadOnlyMemory<TSecond> second)
+    {
+        int minLength = Math.Min(first.Length, second.Length);
+        for (int i = 0; i < minLength; i++)
+        {
+            yield return (first.Span[i], second.Span[i]);
+        }
+    }
+
+    public static IEnumerable<TResult> Zip<TFirst, TSecond, TResult>(this ReadOnlyMemory<TFirst> first, ReadOnlyMemory<TSecond> second, Func<TFirst, TSecond, TResult> resultSelector)
+    {
+        int minLength = Math.Min(first.Length, second.Length);
+        for (int i = 0; i < minLength; i++)
+        {
+            yield return resultSelector(first.Span[i], second.Span[i]);
+        }
+    }
 }
