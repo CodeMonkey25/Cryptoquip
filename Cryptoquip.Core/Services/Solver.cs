@@ -124,7 +124,11 @@ public class Solver
             Word word = words[depth];
             List<string> matches = word.Matches;
 
-            if (candidatesCount[depth] > 0) ring.Remove(candidates.Slice(0, candidatesCount[depth]));
+            if (candidatesCount[depth] > 0)
+            {
+                ring.Remove(candidates.Slice(0, candidatesCount[depth]));
+                candidatesCount[depth] = 0;
+            }
 
             while (matchesIndex[depth] < matches.Count && !ring.Matches(word.Text, matches[matchesIndex[depth]]))
             {
@@ -134,6 +138,7 @@ public class Solver
             if (matchesIndex[depth] >= matches.Count)
             {
                 matchesIndex[depth] = 0;
+                candidatesCount[depth] = 0;
                 depth--;
                 continue;
             }
