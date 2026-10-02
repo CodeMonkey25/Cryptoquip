@@ -18,7 +18,7 @@ public class Puzzle
         Text = OriginalText.AsMemory();
         ring.Clear();
         
-        int i = text.IndexOf("<HINT>:", StringComparison.Ordinal);
+        int i = Text.Span.IndexOf("<HINT>:", StringComparison.Ordinal);
         if (i >= 0)
         {
             ReadOnlyMemory<char> hint = Text.Slice(i + 7, text.Length - i - 7);
