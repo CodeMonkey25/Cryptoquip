@@ -109,7 +109,7 @@ public sealed class DecoderRingBitmask : DecoderRing
         return new DecoderRingBitmask()
         {
             _cypher = this._cypher.ToArray(),
-            Hints = this.Hints.Count == 0 ? [] : this.Hints.ToHashSet(),
+            Hints = this.Hints,
             _usedLetters = this._usedLetters,
             _mappedLetters = this._mappedLetters,
             _solveCount = this._solveCount,
@@ -124,7 +124,7 @@ public sealed class DecoderRingBitmask : DecoderRing
             _usedLetters = otherBitmask._usedLetters;
             _mappedLetters = otherBitmask._mappedLetters;
             _solveCount = otherBitmask._solveCount;
-            Hints = other.Hints.Count == 0 ? [] : other.Hints.ToHashSet();
+            Hints = other.Hints;
         }
         else
         {

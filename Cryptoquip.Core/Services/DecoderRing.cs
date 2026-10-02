@@ -4,7 +4,7 @@ namespace Cryptoquip.Services;
 
 public abstract class DecoderRing
 {
-    protected internal HashSet<char> Hints = [];
+    protected internal uint Hints { get; protected set; }
     
     public abstract int SolveCount { get; }
     public abstract char Get(char letter);
@@ -63,10 +63,17 @@ public abstract class DecoderRing
             
             foreach ((char c1, char c2) in word.Zip(match))
             {
-                if (Put(c1, c2)) Hints.Add(c1);
+                if (Put(c1, c2)) AddHint(c1);
             }
         }
     }
+
+    public void AddHint(char letter)
+    {
+        if (char.IsAsciiLetterUpper(letter)) Hints |= 1u << (letter - 'A');
+    }
+
+    public bool WasSetFromHint(char letter) => char.IsAsciiLetterUpper(letter) && (Hints & (1u << (letter - 'A'))) != 0;
 
     public string Decode(ReadOnlyMemory<char> message) => string.Concat(message.Select(Get));
     
@@ -85,26 +92,19 @@ public abstract class DecoderRing
 
     public virtual void Clear()
     {
-        Hints.Clear();
+        Hints = 0;
     }
 
     public abstract IEnumerable<char> GetUsedLetters();
     
     public virtual IEnumerable<char> GetUnusedLetters()
     {
-        bool[] used = new bool[26];
-        foreach (char c in GetUsedLetters())
-            used[c - 'A'] = true;
-
+        uint used = 0;
+        foreach (char c in GetUsedLetters()) used |= 1u << (c - 'A');
         for (int i = 0; i < 26; i++)
-            if (!used[i]) yield return (char)('A' + i);
+            if ((used & (1u << i)) == 0) yield return (char)('A' + i);
     }
-    
-    public bool WasSetFromHint(char letter)
-    {
-        return Hints.Contains(letter);
-    }
-    
+
     public abstract DecoderRing Clone();
     
     public virtual void Overwrite(DecoderRing other)
@@ -114,9 +114,6 @@ public abstract class DecoderRing
         {
             Put(letter, match);
         }
-        foreach (char hint in other.Hints)
-        {
-            Hints.Add(hint);
-        }
+        Hints = other.Hints;
     }
 }

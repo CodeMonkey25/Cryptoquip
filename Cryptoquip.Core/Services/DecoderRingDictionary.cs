@@ -54,7 +54,7 @@ public sealed class DecoderRingDictionary : DecoderRing
         return new DecoderRingDictionary
         {
             _map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value),
-            Hints = this.Hints.Count == 0 ? [] : this.Hints.ToHashSet()
+            Hints = this.Hints,
         };
     }
 }

@@ -104,7 +104,7 @@ public sealed class DecoderRingArray : DecoderRing
         return new DecoderRingArray()
         {
             _cypher = this._cypher.ToArray(),
-            Hints = this.Hints.Count == 0 ? [] : this.Hints.ToHashSet(),
+            Hints = this.Hints,
             _usedLetters = this._usedLetters.ToArray(),
             _solveCount = this._solveCount,
         };
@@ -117,7 +117,7 @@ public sealed class DecoderRingArray : DecoderRing
             Array.Copy(otherArray._cypher, _cypher, _cypher.Length);
             Array.Copy(otherArray._usedLetters, _usedLetters, _usedLetters.Length);
             _solveCount = otherArray._solveCount;
-            Hints = other.Hints.Count == 0 ? [] : other.Hints.ToHashSet();
+            Hints = other.Hints;
         }
         else
         {
