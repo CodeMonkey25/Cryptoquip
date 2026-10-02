@@ -24,10 +24,17 @@ public class Word : IComparable<Word>
         Span<char> patternBuffer = text.Length <= WordList.MaxWordLength ? stackalloc char[text.Length] : new char[text.Length];
         Span<char> letterBuffer = stackalloc char[26];
         Span<int> touchedBuffer = stackalloc int[26];
-        return MakePattern(text, patternBuffer, letterBuffer, touchedBuffer);
+        WritePattern(text.AsSpan(), patternBuffer, letterBuffer, touchedBuffer);
+        return new string(patternBuffer);
     }
 
     public static string MakePattern(string text, Span<char> patternBuffer, Span<char> letterBuffer, Span<int> touchedBuffer)
+    {
+        WritePattern(text.AsSpan(), patternBuffer, letterBuffer, touchedBuffer);
+        return new string(patternBuffer.Slice(0, text.Length));
+    }
+
+    public static void WritePattern(ReadOnlySpan<char> text, Span<char> patternBuffer, Span<char> letterBuffer, Span<int> touchedBuffer)
     {
         int patternDepth = 0;
         for (int i = 0; i < text.Length; i++)
@@ -57,8 +64,6 @@ public class Word : IComparable<Word>
         {
             letterBuffer[touchedBuffer[i]] = '\0';
         }
-
-        return new string(patternBuffer);
     }
 
     private static uint MakeTextLetterMask(string text)

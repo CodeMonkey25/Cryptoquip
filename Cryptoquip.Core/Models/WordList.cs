@@ -29,22 +29,24 @@ public class WordList
             {
                 if (word.Length < 1) return threadState;
                 
-                if (threadState.Patterns != null)
+                if (threadState.PatternsLookup != null)
                 {
                     if (!threadState.Lengths.Contains(word.Length)) return threadState;
                 }
                 else if (word.Length > threadState.PatternBuffer.Length) return threadState;
                 
-                string pattern = Word.MakePattern(word, threadState.PatternBuffer.AsSpan(0, word.Length), threadState.LetterBuffer, threadState.TouchedBuffer);
-                if (threadState.Patterns != null && !threadState.Patterns.Contains(pattern)) return threadState;
+                Span<char> patternSpan = threadState.PatternBuffer.AsSpan(0, word.Length);
+                Word.WritePattern(word.AsSpan(), patternSpan, threadState.LetterBuffer, threadState.TouchedBuffer);
+
+                if (threadState.PatternsLookup is { } patternsLookup && !patternsLookup.Contains(patternSpan)) return threadState;
                 
-                if (threadState.PatternMap.TryGetValue(pattern, out List<string>? list))
+                if (threadState.PatternMapLookup.TryGetValue(patternSpan, out List<string>? list))
                 {
                     list.Add(word);
                 }
                 else
                 {
-                    threadState.PatternMap.Add(pattern, [word,]);
+                    threadState.PatternMapLookup.TryAdd(patternSpan, [word,]);
                 }
                 return threadState;
             },
@@ -131,14 +133,25 @@ public class WordList
         return matches;
     }
     
-    private class ThreadState(IReadOnlySet<string>? patterns, HashSet<int> lengths, int maxPatternLength, Dictionary<string, List<string>> mainDict)
+    private sealed class ThreadState
     {
-        public readonly IReadOnlySet<string>? Patterns = patterns;
-        public readonly HashSet<int> Lengths = lengths;
-        public readonly Dictionary<string, List<string>> PatternMap = new(StringComparer.Ordinal);
-        public readonly char[] PatternBuffer = new char[maxPatternLength];
+        public readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>>? PatternsLookup;
+        public readonly HashSet<int> Lengths;
+        public readonly Dictionary<string, List<string>> PatternMap;
+        public readonly Dictionary<string, List<string>>.AlternateLookup<ReadOnlySpan<char>> PatternMapLookup;
+        public readonly char[] PatternBuffer;
         public readonly char[] LetterBuffer = new char[26];
         public readonly int[] TouchedBuffer = new int[26];
-        public readonly Dictionary<string, List<string>> MainDict = mainDict;
+        public readonly Dictionary<string, List<string>> MainDict;
+
+        public ThreadState(HashSet<string>? patterns, HashSet<int> lengths, int maxPatternLength, Dictionary<string, List<string>> mainDict)
+        {
+            PatternsLookup = patterns?.GetAlternateLookup<ReadOnlySpan<char>>();
+            Lengths = lengths;
+            PatternMap = new Dictionary<string, List<string>>(StringComparer.Ordinal);
+            PatternMapLookup = PatternMap.GetAlternateLookup<ReadOnlySpan<char>>();
+            PatternBuffer = new char[maxPatternLength];
+            MainDict = mainDict;
+        }
     }
 }
