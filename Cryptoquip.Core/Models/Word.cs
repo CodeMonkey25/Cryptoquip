@@ -101,6 +101,7 @@ public class Word : IComparable<Word>
         if (Text == other.Text) return 0;
         
         if (Matches.Count != other.Matches.Count) return Matches.Count.CompareTo(other.Matches.Count);
-        return -Text.Length.CompareTo(other.Text.Length);
+        if (Text.Length != other.Text.Length) return -Text.Length.CompareTo(other.Text.Length);
+        return string.Compare(Text, other.Text, StringComparison.Ordinal);
     }
 }
