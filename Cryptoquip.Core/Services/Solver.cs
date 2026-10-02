@@ -89,6 +89,29 @@ public class Solver
             partialSolution.Overwrite(ring);
         }
 		
+        // pick the most-constrained word; bail out early if any word is dead
+        int best = -1;
+        int bestCount = int.MaxValue;
+        for (int i = 0; i < words.Length; i++)
+        {
+            int count = 0;
+            foreach (string m in words[i].Matches)
+            {
+                if (ring.Matches(words[i].Text, m))
+                {
+                    if (++count >= bestCount) break;
+                }
+            }
+
+            if (count == 0) return false; // early pruning
+            if (count < bestCount)
+            {
+                bestCount = count;
+                best = i;
+            }
+        }
+        if (best > 0) (words[0], words[best]) = (words[best], words[0]);
+        
         Word word = words[0];
         Span<char> candidates = stackalloc char[word.Text.Length];
         foreach(string possibleMatch in word.Matches)
