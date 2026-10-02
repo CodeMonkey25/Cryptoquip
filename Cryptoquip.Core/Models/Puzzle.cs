@@ -1,6 +1,7 @@
 ﻿using System.Buffers;
 using Cryptoquip.Extensions;
 using Cryptoquip.Services;
+using Cryptoquip.Utility;
 
 namespace Cryptoquip.Models;
 
@@ -41,7 +42,7 @@ public class Puzzle
             .Select(static w => w.Trim(Puzzle.TrimChars))
             .Where(static w => !w.IsEmpty)
             .Where(static w => !w.Span.ContainsAnyExcept(Puzzle.ValidWordChars))
-            .Distinct()
+            .Distinct(ReadOnlyMemoryEqualityComparer<char>.Instance)
             .Select(static w => new string(w.Span));
     }
 }
