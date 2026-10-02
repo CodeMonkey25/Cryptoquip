@@ -90,7 +90,7 @@ public class Solver
         }
 		
         // pick the most-constrained word; bail out early if any word is dead
-        int best = -1;
+        int bestIndex = -1;
         int bestCount = int.MaxValue;
         for (int i = 0; i < words.Length; i++)
         {
@@ -107,10 +107,10 @@ public class Solver
             if (count < bestCount)
             {
                 bestCount = count;
-                best = i;
+                bestIndex = i;
             }
         }
-        if (best > 0) (words[0], words[best]) = (words[best], words[0]);
+        if (bestIndex > 0) (words[0], words[bestIndex]) = (words[bestIndex], words[0]);
         
         Word word = words[0];
         Span<char> candidates = stackalloc char[word.Text.Length];
