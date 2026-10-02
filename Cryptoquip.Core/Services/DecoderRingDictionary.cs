@@ -53,7 +53,7 @@ public sealed class DecoderRingDictionary : DecoderRing
     {
         return new DecoderRingDictionary
         {
-            _map = this._map.ToDictionary(static entry => entry.Key, static entry => entry.Value),
+            _map = new(this._map),
             Hints = this.Hints,
         };
     }
