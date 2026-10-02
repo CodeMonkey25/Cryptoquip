@@ -1,10 +1,14 @@
-﻿using Cryptoquip.Extensions;
+﻿using System.Buffers;
+using Cryptoquip.Extensions;
 using Cryptoquip.Services;
 
 namespace Cryptoquip.Models;
 
 public class Puzzle
 {
+    private static readonly SearchValues<char> ValidWordChars = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZ'");
+    private static readonly char[] TrimChars = ['.', ',', '!', '?', '"', ';', ':'];
+    
     public string OriginalText { get; }
     public ReadOnlyMemory<char> Text { get; set; }
 
@@ -23,26 +27,21 @@ public class Puzzle
         }
     }
 
-    public string[] GetAllWords()
+    public IEnumerable<ReadOnlyMemory<char>> GetAllWords()
     {
         return Text
             .Split(' ')
             .Select(static w => w.Trim())
-            .Select(static w => new string(w.Span))
-            .Where(w => !string.IsNullOrEmpty(w))
-            .ToArray();
+            .Where(static w => !w.IsEmpty);
     }
 
-    public string[] GetFilteredAndDistinctWords()
+    public IEnumerable<string> GetFilteredAndDistinctWords()
     {
         return GetAllWords()
-            .Select(static w => w.Trim('.'))
-            .Select(static w => w.Trim(','))
-            .Select(static w => w.Trim('!'))
-            .Select(static w => w.Trim('?'))
-            .Select(static w => w.Trim('"'))
-            .Where(static w => w.All(static c => char.IsAsciiLetterUpper(c) || c == '\''))
+            .Select(static w => w.Trim(Puzzle.TrimChars))
+            .Where(static w => !w.IsEmpty)
+            .Where(static w => !w.Span.ContainsAnyExcept(Puzzle.ValidWordChars))
             .Distinct()
-            .ToArray();
+            .Select(static w => new string(w.Span));
     }
 }

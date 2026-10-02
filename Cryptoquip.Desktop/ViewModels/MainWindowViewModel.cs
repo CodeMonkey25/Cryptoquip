@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Cryptoquip.Extensions;
 using Cryptoquip.Models;
@@ -27,9 +28,9 @@ public class MainWindowViewModel : ViewModelBase
         
         Words.Clear();
         Dictionary<char, LetterViewModel> letterMap = new();
-        foreach (string word in Puzzle.GetAllWords())
+        foreach (ReadOnlyMemory<char> word in Puzzle.GetAllWords())
         {
-            Words.Add(new WordViewModel(word, letterMap));
+            Words.Add(new WordViewModel(new string(word.Span), letterMap));
         }
     }
 }
