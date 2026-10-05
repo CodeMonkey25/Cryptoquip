@@ -9,7 +9,11 @@ public sealed class MatchRequirementsDictionary : MatchRequirements
         for (int i = 0; i < match.Length; i++)
         {
             char l = text[i];
+            if (!char.IsAsciiLetterUpper(l)) continue;
+
             char m = match[i];
+            if (!char.IsAsciiLetterUpper(m)) continue;
+
             if (_requirements.TryGetValue(l, out HashSet<char>? set))
             {
                 set.Add(m);
@@ -26,6 +30,7 @@ public sealed class MatchRequirementsDictionary : MatchRequirements
         for (int i = 0; i < match.Length; i++)
         {
             char l = text[i];
+            if (!char.IsAsciiLetterUpper(l)) continue;
             if (!_requirements.TryGetValue(l, out HashSet<char>? set)) continue;
 
             char m = match[i];
