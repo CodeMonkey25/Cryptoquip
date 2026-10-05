@@ -8,6 +8,7 @@ public class WordList
     private const string DictionaryFileName = @"dictionary.txt";
     internal const int MaxWordLength = 50;
     private readonly Dictionary<string,List<string>> _words = new();
+    public IReadOnlyDictionary<string,List<string>> Words => _words;
 
     public WordList(HashSet<string>? patterns = null)
     {
