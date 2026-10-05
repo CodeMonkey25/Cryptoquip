@@ -19,8 +19,9 @@ public sealed class DecoderRingDictionary : DecoderRing
 
     public override IEnumerable<(char letter, char match)> GetMatches()
     {
-        foreach (var kvp in _map)
-            yield return (kvp.Key, kvp.Value);
+        for (char letter = 'A'; letter <= 'Z'; letter++)
+            if (_map.TryGetValue(letter, out char match))
+                yield return (letter, match);
     }
 
     public override void Remove(char letter)
@@ -35,7 +36,10 @@ public sealed class DecoderRingDictionary : DecoderRing
 
     public override IEnumerable<char> GetUsedLetters()
     {
-        return _map.Values;
+        uint used = 0;
+        foreach (char c in _map.Values) used |= 1u << (c - 'A');
+        for (int i = 0; i < 26; i++)
+            if ((used & (1u << i)) != 0) yield return (char)('A' + i);
     }
     
     public override bool UsedContains(char letter)
