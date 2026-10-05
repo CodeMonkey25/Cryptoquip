@@ -1,4 +1,5 @@
-﻿using Cryptoquip.Services;
+﻿using System.Runtime.InteropServices;
+using Cryptoquip.Services;
 
 namespace Cryptoquip.Models;
 
@@ -10,44 +11,32 @@ public class WordList
 
     public WordList(HashSet<string>? patterns = null)
     {
-        HashSet<int> lengths = [];
+        bool[]? lengths = null;
         int maxPatternLength = WordList.MaxWordLength;
         if (patterns != null && patterns.Count > 0)
         {
-            maxPatternLength = 0;
-            foreach (string pattern in patterns)
-            {
-                lengths.Add(pattern.Length);
-                if (pattern.Length > maxPatternLength) maxPatternLength = pattern.Length;
-            }
+            maxPatternLength = patterns.Select(pattern => pattern.Length).Max();
+            lengths = new bool[maxPatternLength + 1];
+            foreach (string pattern in patterns) lengths[pattern.Length] = true;
         }
         
         Parallel.ForEach(
-            File.ReadLines(DictionaryFileName),
+            File.ReadLines(Path.Combine(AppContext.BaseDirectory, WordList.DictionaryFileName)),
             () => new ThreadState(patterns, lengths, maxPatternLength, _words),
             static (word, _, threadState) =>
             {
                 if (word.Length < 1) return threadState;
-                
-                if (threadState.PatternsLookup != null)
-                {
-                    if (!threadState.Lengths.Contains(word.Length)) return threadState;
-                }
-                else if (word.Length > threadState.PatternBuffer.Length) return threadState;
+                if (word.Length > threadState.PatternBuffer.Length) return threadState;
+                if (threadState.Lengths != null && !threadState.Lengths[word.Length]) return threadState;
                 
                 Span<char> patternSpan = threadState.PatternBuffer.AsSpan(0, word.Length);
                 Word.WritePattern(word.AsSpan(), patternSpan, threadState.LetterBuffer, threadState.TouchedBuffer);
 
                 if (threadState.PatternsLookup is { } patternsLookup && !patternsLookup.Contains(patternSpan)) return threadState;
                 
-                if (threadState.PatternMapLookup.TryGetValue(patternSpan, out List<string>? list))
-                {
-                    list.Add(word);
-                }
-                else
-                {
-                    threadState.PatternMapLookup.TryAdd(patternSpan, [word,]);
-                }
+                ref List<string>? list = ref CollectionsMarshal.GetValueRefOrAddDefault(threadState.PatternMapLookup, patternSpan, out bool _);
+                (list ??= []).Add(word);
+                
                 return threadState;
             },
             static (threadState) =>
@@ -73,6 +62,7 @@ public class WordList
         foreach (List<string> value in _words.Values)
         {
             value.TrimExcess();
+            value.Sort(StringComparer.Ordinal);
         }
         
         // int[] lengths = patterns.Select(pattern => pattern.Length).Distinct().ToArray();
@@ -129,14 +119,13 @@ public class WordList
         {
             if (ring.Matches(word.Text, w)) matches.Add(w);
         }
-        matches.TrimExcess();
         return matches;
     }
     
     private sealed class ThreadState
     {
         public readonly HashSet<string>.AlternateLookup<ReadOnlySpan<char>>? PatternsLookup;
-        public readonly HashSet<int> Lengths;
+        public readonly bool[]? Lengths;
         public readonly Dictionary<string, List<string>> PatternMap;
         public readonly Dictionary<string, List<string>>.AlternateLookup<ReadOnlySpan<char>> PatternMapLookup;
         public readonly char[] PatternBuffer;
@@ -144,7 +133,7 @@ public class WordList
         public readonly int[] TouchedBuffer = new int[26];
         public readonly Dictionary<string, List<string>> MainDict;
 
-        public ThreadState(HashSet<string>? patterns, HashSet<int> lengths, int maxPatternLength, Dictionary<string, List<string>> mainDict)
+        public ThreadState(HashSet<string>? patterns, bool[]? lengths, int maxPatternLength, Dictionary<string, List<string>> mainDict)
         {
             PatternsLookup = patterns?.GetAlternateLookup<ReadOnlySpan<char>>();
             Lengths = lengths;
