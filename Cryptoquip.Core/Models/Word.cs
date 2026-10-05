@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Cryptoquip.Models;
 
@@ -13,10 +14,10 @@ public class Word : IComparable<Word>
     public Word(string text)
     {
         Text = text;
-        Pattern = MakePattern(text);
+        Pattern = Word.MakePattern(Text);
         Matches = [];
-        LetterMask = MakeTextLetterMask(text);
-        IsSolvable = Text.Any(char.IsAsciiLetterUpper) && !Text.Any(char.IsWhiteSpace);
+        LetterMask = Text.Where(char.IsAsciiLetterUpper).Aggregate(0u, (mask, c) => mask | 1u << (c - 'A'));
+        IsSolvable = LetterMask != 0u && !Text.Any(char.IsWhiteSpace);
     }
 
     public static string MakePattern(string text)
@@ -24,18 +25,25 @@ public class Word : IComparable<Word>
         Span<char> patternBuffer = text.Length <= WordList.MaxWordLength ? stackalloc char[text.Length] : new char[text.Length];
         Span<char> letterBuffer = stackalloc char[26];
         Span<int> touchedBuffer = stackalloc int[26];
-        WritePattern(text.AsSpan(), patternBuffer, letterBuffer, touchedBuffer);
-        return new string(patternBuffer);
+        return Word.MakePattern(text, patternBuffer, letterBuffer, touchedBuffer);
     }
 
+    /// <remarks>letterBuffer must be zeroed on entry; it is restored to zero on exit.</remarks>
     public static string MakePattern(string text, Span<char> patternBuffer, Span<char> letterBuffer, Span<int> touchedBuffer)
     {
-        WritePattern(text.AsSpan(), patternBuffer, letterBuffer, touchedBuffer);
+        ArgumentOutOfRangeException.ThrowIfLessThan(patternBuffer.Length, text.Length);
+        ArgumentOutOfRangeException.ThrowIfLessThan(letterBuffer.Length, 26);
+        ArgumentOutOfRangeException.ThrowIfLessThan(touchedBuffer.Length, 26);
+        Word.WritePattern(text.AsSpan(), patternBuffer, letterBuffer, touchedBuffer);
         return new string(patternBuffer.Slice(0, text.Length));
     }
 
+    /// <remarks>letterBuffer must be zeroed on entry; it is restored to zero on exit.</remarks>
     public static void WritePattern(ReadOnlySpan<char> text, Span<char> patternBuffer, Span<char> letterBuffer, Span<int> touchedBuffer)
     {
+        Debug.Assert(patternBuffer.Length >= text.Length);
+        Debug.Assert(letterBuffer.Length >= 26 && touchedBuffer.Length >= 26);
+        
         int patternDepth = 0;
         for (int i = 0; i < text.Length; i++)
         {
@@ -64,16 +72,6 @@ public class Word : IComparable<Word>
         {
             letterBuffer[touchedBuffer[i]] = '\0';
         }
-    }
-
-    private static uint MakeTextLetterMask(string text)
-    {
-        uint mask = 0;
-        foreach (char c in text)
-        {
-            if (char.IsAsciiLetterUpper(c)) mask |= 1u << (c - 'A');
-        }
-        return mask;
     }
 
     public MatchRequirements GetMatchRequirements()
