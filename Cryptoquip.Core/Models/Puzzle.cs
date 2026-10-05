@@ -22,7 +22,7 @@ public class Puzzle
         int i = Text.Span.IndexOf("<HINT>:", StringComparison.Ordinal);
         if (i >= 0)
         {
-            ReadOnlyMemory<char> hint = Text.Slice(i + 7, text.Length - i - 7);
+            ReadOnlyMemory<char> hint = Text.Slice(i + 7);
             ring.LoadHints(hint);
             Text = Text.Slice(0, i);
         }
