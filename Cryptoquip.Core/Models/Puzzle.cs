@@ -9,23 +9,38 @@ public class Puzzle
 {
     private static readonly SearchValues<char> ValidWordChars = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZ'");
     private static readonly char[] TrimChars = ['.', ',', '!', '?', '"', ';', ':'];
-    
-    public string OriginalText { get; }
-    public ReadOnlyMemory<char> Text { get; set; }
 
-    public Puzzle(string text, DecoderRing ring)
+    public string OriginalText { get; }
+    public ReadOnlyMemory<char> Text { get; }
+
+    private Puzzle(string originalText, ReadOnlyMemory<char> text)
     {
-        OriginalText = text.ToUpper().Trim();
-        Text = OriginalText.AsMemory();
-        ring.Clear();
-        
-        int i = Text.Span.IndexOf("<HINT>:", StringComparison.Ordinal);
+        OriginalText = originalText;
+        Text = text;
+    }
+    
+    public static (Puzzle, DecoderRing) Parse(string text, DecoderRing? ring = null)
+    {
+        if (ring == null)
+        {
+            ring = DecoderRing.Build();
+        }
+        else
+        {
+            ring.Clear();
+        }
+
+        string originalText = text.ToUpper().Trim();
+        ReadOnlyMemory<char> textMemory = originalText.AsMemory();
+        int i = originalText.IndexOf("<HINT>:", StringComparison.Ordinal);
         if (i >= 0)
         {
-            ReadOnlyMemory<char> hint = Text.Slice(i + 7);
+            string hint = originalText.Substring(i + 7);
             ring.LoadHints(hint);
-            Text = Text.Slice(0, i);
+            textMemory = textMemory.Slice(0, i).TrimEnd();
         }
+        
+        return (new Puzzle(originalText, textMemory), ring);
     }
 
     public IEnumerable<ReadOnlyMemory<char>> GetAllWords()

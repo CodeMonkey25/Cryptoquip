@@ -11,12 +11,11 @@ namespace Cryptoquip.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private ObservableCollection<WordViewModel> _words = [];
     public ObservableCollection<WordViewModel> Words
     {
-        get => _words;
-        set => this.RaiseAndSetIfChanged(ref _words, value);
-    }
+        get;
+        set => this.RaiseAndSetIfChanged(ref field, value);
+    } = [];
 
     public Puzzle? Puzzle { get; private set; }
 
@@ -24,7 +23,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
         
-        Puzzle = new(text, ring);
+        (Puzzle, _) = Puzzle.Parse(text, ring);
         
         Words.Clear();
         Dictionary<char, LetterViewModel> letterMap = new();

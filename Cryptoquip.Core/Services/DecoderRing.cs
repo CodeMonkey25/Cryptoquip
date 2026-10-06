@@ -4,6 +4,8 @@ namespace Cryptoquip.Services;
 
 public abstract class DecoderRing
 {
+    public static DecoderRing Build() => new DecoderRingBitmask();
+    
     protected internal uint Hints { get; protected set; }
     
     public abstract int SolveCount { get; }
@@ -51,14 +53,14 @@ public abstract class DecoderRing
         return true;
     }
 
-    public void LoadHints(ReadOnlyMemory<char> hints)
+    public void LoadHints(string hints)
     {
-        foreach (ReadOnlyMemory<char> hint in hints.Split(',').Select(static h => h.Trim()))
+        foreach (string hint in hints.Split(',').Select(static h => h.Trim()))
         {
-            ReadOnlyMemory<char>[] parts = hint.Split('=').Select(static h => h.Trim()).ToArray();
+            string[] parts = hint.Split('=').Select(static h => h.Trim()).ToArray();
             if (parts.Length != 2) continue;
             
-            (ReadOnlyMemory<char> word, ReadOnlyMemory<char> match) = (parts[0], parts[1]);
+            (string word, string match) = (parts[0], parts[1]);
             if (word.Length != match.Length) continue;
             
             foreach ((char c1, char c2) in word.Zip(match))

@@ -442,7 +442,7 @@ public class DecoderRingTests
     {
         DecoderRing ring = Create(type);
 
-        ring.LoadHints("XYZ=THE".AsMemory());
+        ring.LoadHints("XYZ=THE");
 
         Assert.Equal("THE", ring.Decode("XYZ".AsMemory()));
         Assert.All("XYZ", c => Assert.True(ring.WasSetFromHint(c)));
@@ -455,7 +455,7 @@ public class DecoderRingTests
     {
         DecoderRing ring = Create(type);
 
-        ring.LoadHints(" X = T ,Y=H,  Z =E ".AsMemory());
+        ring.LoadHints(" X = T ,Y=H,  Z =E ");
 
         Assert.Equal("THE", ring.Decode("XYZ".AsMemory()));
         Assert.All("XYZ", c => Assert.True(ring.WasSetFromHint(c)));
@@ -476,7 +476,7 @@ public class DecoderRingTests
         {
             DecoderRing ring = Create(type);
 
-            ring.LoadHints(hints.AsMemory());
+            ring.LoadHints(hints);
 
             Assert.Equal(0, ring.SolveCount);
             Assert.All(Alphabet, c => Assert.False(ring.WasSetFromHint(c)));
@@ -489,7 +489,7 @@ public class DecoderRingTests
     {
         DecoderRing ring = Create(type);
 
-        ring.LoadHints("XY=THE, Q=R, AB".AsMemory());
+        ring.LoadHints("XY=THE, Q=R, AB");
 
         Assert.Equal([('Q', 'R')], MatchList(ring));
     }
@@ -500,7 +500,7 @@ public class DecoderRingTests
     {
         DecoderRing ring = Create(type);
 
-        ring.LoadHints("XYZ'W=DON'T".AsMemory());
+        ring.LoadHints("XYZ'W=DON'T");
 
         Assert.Equal("DON'T", ring.Decode("XYZ'W".AsMemory()));
         Assert.Equal(4, ring.SolveCount);
@@ -512,7 +512,7 @@ public class DecoderRingTests
     {
         DecoderRing ring = Create(type, "X", "Q");
 
-        ring.LoadHints("XY=TH".AsMemory());
+        ring.LoadHints("XY=TH");
 
         Assert.Equal('Q', ring.Get('X'));
         Assert.False(ring.WasSetFromHint('X'));
@@ -525,7 +525,7 @@ public class DecoderRingTests
     public void RemoveHintedLetter_KeepsHintFlag(Type type)
     {
         DecoderRing ring = Create(type);
-        ring.LoadHints("X=T".AsMemory());
+        ring.LoadHints("X=T");
 
         ring.Remove('X');
 
@@ -571,7 +571,7 @@ public class DecoderRingTests
     public void Clear_RemovesMappingsAndHints(Type type)
     {
         DecoderRing ring = Create(type);
-        ring.LoadHints("XYZ=THE".AsMemory());
+        ring.LoadHints("XYZ=THE");
         ring.Put('Q', 'R');
 
         ring.Clear();
@@ -608,7 +608,7 @@ public class DecoderRingTests
     public void Clone_CopiesMappingsAndHints(Type type)
     {
         DecoderRing ring = Create(type, "Q", "R");
-        ring.LoadHints("XYZ=THE".AsMemory());
+        ring.LoadHints("XYZ=THE");
 
         DecoderRing clone = ring.Clone();
 
@@ -643,7 +643,7 @@ public class DecoderRingTests
     public void Clone_ClearingCloneLeavesOriginalHints(Type type)
     {
         DecoderRing ring = Create(type);
-        ring.LoadHints("X=T".AsMemory());
+        ring.LoadHints("X=T");
 
         ring.Clone().Clear();
 
@@ -660,7 +660,7 @@ public class DecoderRingTests
     public void Overwrite_CopiesMappingsAndHintsFromAnyImplementation(Type targetType, Type sourceType)
     {
         DecoderRing source = Create(sourceType, "Q", "R");
-        source.LoadHints("XYZ=THE".AsMemory());
+        source.LoadHints("XYZ=THE");
         DecoderRing target = Create(targetType, "AB", "CD");
         target.AddHint('A');
 
@@ -756,7 +756,7 @@ public class DecoderRingTests
     {
         DecoderRingNull ring = new();
 
-        ring.LoadHints("XYZ=THE".AsMemory());
+        ring.LoadHints("XYZ=THE");
 
         Assert.Equal(0, ring.SolveCount);
         Assert.All("XYZ", c => Assert.False(ring.WasSetFromHint(c)));

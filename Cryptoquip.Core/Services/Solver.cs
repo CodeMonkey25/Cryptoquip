@@ -4,10 +4,9 @@ namespace Cryptoquip.Services;
 
 public class Solver
 {
-    public void Run(Action<string> logMessage, DecoderRing ring, WordList? wordList, Puzzle puzzle,
-        bool enableExclusionAnalysis)
+    public void Run(Action<string> logMessage, Puzzle puzzle, DecoderRing ring, WordList? wordList = null, bool enableExclusionAnalysis = false)
     {
-        logMessage($"Received puzzle: {puzzle}");
+        logMessage($"Received puzzle: {puzzle.Text}");
         logMessage(string.Empty);
         
         Word[] words = puzzle

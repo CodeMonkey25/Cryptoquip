@@ -14,11 +14,9 @@ class Program
      
         Stopwatch watch = Stopwatch.StartNew();
         
-        DecoderRing ring = new DecoderRingBitmask();
-        Puzzle puzzle = new(text, ring);
-        WordList? wordList = null;
+        (Puzzle puzzle, DecoderRing ring) = Puzzle.Parse(text);
         Solver solver = new();
-        solver.Run(LogMessage, ring, wordList, puzzle, false);
+        solver.Run(LogMessage, puzzle, ring, null, false);
         watch.Stop();
         
         LogMessage(string.Empty);

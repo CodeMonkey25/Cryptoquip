@@ -39,7 +39,7 @@ public class SolverWindowViewModel : ViewModelBase
     {
         Stopwatch watch = Stopwatch.StartNew();
         Solver solver = new();
-        solver.Run(LogMessage, Ring, WordList!, Puzzle!, EnableExclusionAnalysis);
+        solver.Run(LogMessage, Puzzle!, Ring, WordList!, EnableExclusionAnalysis);
         watch.Stop();
         
         LogMessage(string.Empty);
