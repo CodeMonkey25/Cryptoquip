@@ -7,7 +7,7 @@ namespace Cryptoquip.Models;
 public class Puzzle
 {
     private static readonly SearchValues<char> ValidWordChars = SearchValues.Create("ABCDEFGHIJKLMNOPQRSTUVWXYZ'");
-    private static readonly char[] TrimChars = ['.', ',', '!', '?', '"', ';', ':'];
+    private static readonly char[] TrimChars = ['.', ',', '!', '?', '"', ';', ':',];
 
     public string OriginalText { get; }
     public ReadOnlyMemory<char> Text { get; }
@@ -20,20 +20,20 @@ public class Puzzle
         Hints = hints;
     }
     
-    public static Puzzle Parse(string text)
+    public static Puzzle Parse(string puzzle)
     {
-        string originalText = text.ToUpper().Trim();
-        ReadOnlyMemory<char> textMemory = originalText.AsMemory();
+        string originalText = puzzle.Trim().ToUpper();
+        ReadOnlyMemory<char> text = originalText.AsMemory();
         Dictionary<char, char> hints = new();
         
         int i = originalText.IndexOf("<HINT>:", StringComparison.Ordinal);
         if (i >= 0)
         {
             hints = ParseHints(originalText.AsSpan(i + 7));
-            textMemory = textMemory.Slice(0, i).TrimEnd();
+            text = text.Slice(0, i).TrimEnd();
         }
         
-        return new Puzzle(originalText, textMemory, hints);
+        return new Puzzle(originalText, text, hints);
     }
     
     private static Dictionary<char, char> ParseHints(ReadOnlySpan<char> hints)
