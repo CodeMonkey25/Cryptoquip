@@ -22,8 +22,10 @@ public class MainWindowViewModel : ViewModelBase
     public void LoadPuzzle(string text)
     {
         DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
+        ring.Clear();
         
-        (Puzzle, _) = Puzzle.Parse(text, ring);
+        Puzzle = Puzzle.Parse(text);
+        ring.LoadHints(Puzzle.Hints);
         
         Words.Clear();
         Dictionary<char, LetterViewModel> letterMap = new();

@@ -14,7 +14,9 @@ class Program
      
         Stopwatch watch = Stopwatch.StartNew();
         
-        (Puzzle puzzle, DecoderRing ring) = Puzzle.Parse(text);
+        Puzzle puzzle = Puzzle.Parse(text);
+        DecoderRing ring = DecoderRing.Build();
+        ring.LoadHints(puzzle.Hints);
         Solver solver = new();
         solver.Run(LogMessage, puzzle, ring, null, false);
         watch.Stop();

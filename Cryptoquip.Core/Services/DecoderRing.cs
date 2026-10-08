@@ -53,27 +53,21 @@ public abstract class DecoderRing
         return true;
     }
 
-    public void LoadHints(string hints)
+    public void LoadHints(IReadOnlyDictionary<char, char> hints)
     {
-        foreach (string hint in hints.Split(',').Select(static h => h.Trim()))
+        ClearHints();
+        foreach ((char letter, char match) in hints)
         {
-            string[] parts = hint.Split('=').Select(static h => h.Trim()).ToArray();
-            if (parts.Length != 2) continue;
-            
-            (string word, string match) = (parts[0], parts[1]);
-            if (word.Length != match.Length) continue;
-            
-            foreach ((char c1, char c2) in word.Zip(match))
-            {
-                if (Put(c1, c2)) AddHint(c1);
-            }
+            if (Put(letter, match)) AddHint(letter);
         }
     }
 
-    public void AddHint(char letter)
+    private void AddHint(char letter)
     {
         if (char.IsAsciiLetterUpper(letter)) Hints |= 1u << (letter - 'A');
     }
+    
+    public void ClearHints() => Hints = 0;
 
     public bool WasSetFromHint(char letter) => char.IsAsciiLetterUpper(letter) && (Hints & (1u << (letter - 'A'))) != 0;
 
@@ -94,7 +88,7 @@ public abstract class DecoderRing
 
     public virtual void Clear()
     {
-        Hints = 0;
+        ClearHints();
     }
 
     public abstract IEnumerable<char> GetUsedLetters();

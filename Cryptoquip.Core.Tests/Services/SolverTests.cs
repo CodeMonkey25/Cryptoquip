@@ -21,12 +21,14 @@ public class SolverTests
 
     private static (List<string> log, DecoderRing ring) Solve(string text, DecoderRing? ring = null, WordList? wordList = null, bool enableExclusionAnalysis = false)
     {
-        (Puzzle puzzle, DecoderRing parsedRing) = Puzzle.Parse(text, ring);
+        Puzzle puzzle = Puzzle.Parse(text);
+        ring ??= DecoderRing.Build();
+        ring.LoadHints(puzzle.Hints);
         List<string> log = [];
 
-        new Solver().Run(log.Add, puzzle, parsedRing, wordList, enableExclusionAnalysis);
+        new Solver().Run(log.Add, puzzle, ring, wordList, enableExclusionAnalysis);
 
-        return (log, parsedRing);
+        return (log, ring);
     }
 
     #region Solving
