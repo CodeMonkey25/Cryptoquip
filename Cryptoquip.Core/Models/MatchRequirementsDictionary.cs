@@ -4,7 +4,7 @@ public sealed class MatchRequirementsDictionary : MatchRequirements
 {
     private readonly Dictionary<char, HashSet<char>> _requirements = new();
 
-    protected override void RegisterMatch(string text, string match)
+    protected override void RegisterMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> match)
     {
         for (int i = 0; i < match.Length; i++)
         {
@@ -25,7 +25,7 @@ public sealed class MatchRequirementsDictionary : MatchRequirements
         }
     }
 
-    public override bool Matches(string text, string match)
+    public override bool Matches(ReadOnlySpan<char> text, ReadOnlySpan<char> match)
     {
         for (int i = 0; i < match.Length; i++)
         {

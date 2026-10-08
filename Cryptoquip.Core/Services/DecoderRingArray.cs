@@ -146,6 +146,7 @@ public sealed class DecoderRingArray : DecoderRing
                     }
                 }
             }
+            else if (letter != candidateMatch) return false;
         }
         return true;
     }

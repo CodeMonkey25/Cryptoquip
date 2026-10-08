@@ -18,9 +18,9 @@ public abstract class MatchRequirements
             RegisterMatch(text, matches[i]);
     }
     
-    protected abstract void RegisterMatch(string text, string match);
+    protected abstract void RegisterMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> match);
     
-    public abstract bool Matches(string text, string match);
+    public abstract bool Matches(ReadOnlySpan<char> text, ReadOnlySpan<char> match);
     
     public abstract void Clear();
 }

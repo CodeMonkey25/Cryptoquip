@@ -4,7 +4,7 @@ public sealed class MatchRequirementsArray : MatchRequirements
 {
     private readonly bool[]?[] _requirements = new bool[26][];
     
-    protected override void RegisterMatch(string text, string match)
+    protected override void RegisterMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> match)
     {
         for (int i = 0; i < match.Length; i++)
         {
@@ -27,7 +27,7 @@ public sealed class MatchRequirementsArray : MatchRequirements
         _requirements[i][m - 'A'] = true;
     }
 
-    public override bool Matches(string text, string match)
+    public override bool Matches(ReadOnlySpan<char> text, ReadOnlySpan<char> match)
     {
         for (int i = 0; i < match.Length; i++)
         {

@@ -153,6 +153,7 @@ public sealed class DecoderRingBitmask : DecoderRing
                     }
                 }
             }
+            else if (letter != candidateMatch) return false;
         }
         return true;
     }

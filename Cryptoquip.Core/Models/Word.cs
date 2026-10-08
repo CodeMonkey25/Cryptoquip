@@ -16,8 +16,16 @@ public class Word : IComparable<Word>
         Text = text;
         Pattern = Word.MakePattern(Text);
         Matches = [];
-        LetterMask = Text.Where(char.IsAsciiLetterUpper).Aggregate(0u, (mask, c) => mask | 1u << (c - 'A'));
-        IsSolvable = LetterMask != 0u && !Text.Any(char.IsWhiteSpace);
+        
+        uint mask = 0;
+        bool hasWhitespace = false;
+        foreach (char c in text)
+        {
+            if (char.IsAsciiLetterUpper(c)) mask |= 1u << (c - 'A');
+            else if (char.IsWhiteSpace(c)) hasWhitespace = true;
+        }
+        LetterMask = mask;
+        IsSolvable = mask != 0 && !hasWhitespace;
     }
 
     public static string MakePattern(string text)
@@ -101,7 +109,6 @@ public class Word : IComparable<Word>
     {
         if (ReferenceEquals(this, other)) return 0;
         if (other is null) return 1;
-        if (Text == other.Text) return 0;
         
         if (Matches.Count != other.Matches.Count) return Matches.Count.CompareTo(other.Matches.Count);
         if (Text.Length != other.Text.Length) return -Text.Length.CompareTo(other.Text.Length);

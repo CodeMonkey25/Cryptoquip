@@ -1,31 +1,67 @@
-﻿namespace Cryptoquip.Extensions;
+﻿using System.Buffers;
+
+namespace Cryptoquip.Extensions;
 
 public static class ReadOnlyMemoryExtensions
 {
+    private const int StackAllocThreshold = 128;
+
     public static IEnumerable<ReadOnlyMemory<char>> Split(this ReadOnlyMemory<char> source, char splitChar, StringSplitOptions options = StringSplitOptions.None)
     {
         int separatorCount = source.Span.Count(splitChar);
-        Range[] ranges = new Range[separatorCount + 1];
-        int count = source.Span.Split(ranges, splitChar, options);
-        var result = new ReadOnlyMemory<char>[count];
-        for (int i = 0; i < count; i++)
+        int maxRanges = separatorCount + 1;
+
+        Range[]? rented = null;
+        Span<Range> ranges = maxRanges <= StackAllocThreshold
+            ? stackalloc Range[maxRanges]
+            : (rented = ArrayPool<Range>.Shared.Rent(maxRanges));
+
+        try
         {
-            result[i] = source[ranges[i]];
+            int count = source.Span.Split(ranges, splitChar, options);
+            var result = new ReadOnlyMemory<char>[count];
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = source[ranges[i]];
+            }
+            return result;
         }
-        return result;
+        finally
+        {
+            if (rented != null)
+            {
+                ArrayPool<Range>.Shared.Return(rented);
+            }
+        }
     }
 
     public static IEnumerable<ReadOnlyMemory<char>> Split(this ReadOnlyMemory<char> source, ReadOnlySpan<char> separator, StringSplitOptions options = StringSplitOptions.None)
     {
         int separatorCount = source.Span.Count(separator);
-        Range[] ranges = new Range[separatorCount + 1];
-        int count = source.Span.Split(ranges, separator, options);
-        var result = new ReadOnlyMemory<char>[count];
-        for (int i = 0; i < count; i++)
+        int maxRanges = separatorCount + 1;
+
+        Range[]? rented = null;
+        Span<Range> ranges = maxRanges <= StackAllocThreshold
+            ? stackalloc Range[maxRanges]
+            : (rented = ArrayPool<Range>.Shared.Rent(maxRanges));
+
+        try
         {
-            result[i] = source[ranges[i]];
+            int count = source.Span.Split(ranges, separator, options);
+            var result = new ReadOnlyMemory<char>[count];
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = source[ranges[i]];
+            }
+            return result;
         }
-        return result;
+        finally
+        {
+            if (rented != null)
+            {
+                ArrayPool<Range>.Shared.Return(rented);
+            }
+        }
     }
 
     public static bool Any(this ReadOnlyMemory<char> source, Predicate<char> predicate)

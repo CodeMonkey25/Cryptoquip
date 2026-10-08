@@ -8,7 +8,7 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
     private readonly uint[] _allowedMasks = new uint[26];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected override void RegisterMatch(string text, string match)
+    protected override void RegisterMatch(ReadOnlySpan<char> text, ReadOnlySpan<char> match)
     {
         for (int i = 0; i < match.Length; i++)
         {
@@ -23,7 +23,7 @@ public sealed class MatchRequirementsBitmask : MatchRequirements
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Matches(string text, string match)
+    public override bool Matches(ReadOnlySpan<char> text, ReadOnlySpan<char> match)
     {
         for (int i = 0; i < match.Length; i++)
         {

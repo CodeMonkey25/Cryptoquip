@@ -22,7 +22,7 @@ public class Puzzle
     
     public static Puzzle Parse(string puzzle)
     {
-        string originalText = puzzle.Trim().ToUpper();
+        string originalText = puzzle.Trim().ToUpperInvariant();
         ReadOnlyMemory<char> text = originalText.AsMemory();
         Dictionary<char, char> hints = new();
         

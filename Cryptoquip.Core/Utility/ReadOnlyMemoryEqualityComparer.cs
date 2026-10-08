@@ -12,6 +12,11 @@ public sealed class ReadOnlyMemoryEqualityComparer<T> : IEqualityComparer<ReadOn
 
     public int GetHashCode(ReadOnlyMemory<T> memory)
     {
+        if (memory is ReadOnlyMemory<char> charMemory)
+        {
+            return string.GetHashCode(charMemory.Span, StringComparison.Ordinal);
+        }
+
         ReadOnlySpan<T> span = memory.Span;
         HashCode hash = new();
         foreach (ref readonly T item in span)

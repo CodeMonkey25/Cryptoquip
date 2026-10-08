@@ -63,7 +63,7 @@ public abstract class DecoderRing
     
     public abstract void Remove(char letter);
 
-    public virtual void Remove(Span<char> letters)
+    public void Remove(Span<char> letters)
     {
         foreach (char letter in letters)
         {
@@ -80,10 +80,15 @@ public abstract class DecoderRing
     
     public virtual IEnumerable<char> GetUnusedLetters()
     {
-        uint used = 0;
-        foreach (char c in GetUsedLetters()) used |= 1u << (c - 'A');
+        uint used = GetUsedLetters().Aggregate<char, uint>(0, (current, c) => current | 1u << (c - 'A'));
+
         for (int i = 0; i < 26; i++)
-            if ((used & (1u << i)) == 0) yield return (char)('A' + i);
+        {
+            if ((used & (1u << i)) == 0)
+            {
+                yield return (char)('A' + i);
+            }
+        }
     }
 
     public abstract DecoderRing Clone();

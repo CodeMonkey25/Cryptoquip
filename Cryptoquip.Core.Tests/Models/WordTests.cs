@@ -303,16 +303,6 @@ public class WordTests
     }
 
     [Fact]
-    public void CompareTo_SameTextDifferentMatches_ReturnsZero()
-    {
-        Word first = WithMatches("XYZ", "THE");
-        Word second = WithMatches("XYZ", "CAT", "DOG");
-
-        Assert.Equal(0, first.CompareTo(second));
-        Assert.Equal(0, second.CompareTo(first));
-    }
-
-    [Fact]
     public void CompareTo_FewerMatchesSortsFirst_RegardlessOfLength()
     {
         Word fewer = WithMatches("XY", "AN");
