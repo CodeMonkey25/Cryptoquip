@@ -9,6 +9,7 @@ public sealed class DecoderRingNull : DecoderRing
     public override void Remove(char letter) { }
     public override bool Contains(char letter) => false;
     public override bool UsedContains(char letter) => false;
+    public override void Clear() { }
     public override IEnumerable<char> GetUsedLetters() => [];
     public override DecoderRing Clone() => this;
 }

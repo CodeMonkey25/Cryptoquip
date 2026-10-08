@@ -13,10 +13,12 @@ class Program
         const string text = "X KYP Y DSSW SF EYEEG'K BYVU LSEYG YFE YDD SB Y KHEEUF X BSHFE CGKUDB DSSWXFN YL RXC FSL YK CG EYEEG OHL YK YFSLRUZ CYF. CYGOU X'C NZSPXFN HQ Y DXLLDU. CYGOU XL PYK LRU QYXF XF RXK BYVU. OHL XL VYCU LS CU LRYL BSZ YDD LRU QDUYKHZU CSCCY YFE EYEEG BXFE XF HK VRXDEZUF, LRUZU YZU SLRUZ LXCUK XL CHKL OU RUYZLOZUYWXFN LS LRUC. <HINT>:EYEEG'K=DADDY'S, X=I";
      
         Stopwatch watch = Stopwatch.StartNew();
-        
+
         Puzzle puzzle = Puzzle.Parse(text);
+        
         DecoderRing ring = DecoderRing.Build();
-        ring.LoadHints(puzzle.Hints);
+        ring.Put(puzzle.Hints);
+        
         Solver solver = new();
         solver.Run(LogMessage, puzzle, ring, null, false);
         watch.Stop();

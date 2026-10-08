@@ -23,7 +23,7 @@ public class SolverTests
     {
         Puzzle puzzle = Puzzle.Parse(text);
         ring ??= DecoderRing.Build();
-        ring.LoadHints(puzzle.Hints);
+        ring.Put(puzzle.Hints);
         List<string> log = [];
 
         new Solver().Run(log.Add, puzzle, ring, wordList, enableExclusionAnalysis);
@@ -80,8 +80,9 @@ public class SolverTests
         (List<string> log, DecoderRing ring) = Solve("XYZ <HINT>: X=D");
 
         Assert.Equal("DOG", log[^1]);
-        Assert.True(ring.WasSetFromHint('X'));
-        Assert.False(ring.WasSetFromHint('Y'));
+        Assert.Equal('D', ring.Get('X'));
+        Assert.Equal('O', ring.Get('Y'));
+        Assert.Equal('G', ring.Get('Z'));
     }
 
     [Fact]

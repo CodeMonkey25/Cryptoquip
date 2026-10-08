@@ -50,13 +50,14 @@ public class LetterViewModel : ViewModelBase
         SolveLetterCommand = ReactiveCommand.Create<char, Unit>(SolveLetter);
     }
 
-    public LetterViewModel(char letter) : this()
+    public LetterViewModel(char letter, bool isHint) : this()
     {
         Letter = letter;
         
         DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
         DecodedLetter = ring.Get(letter);
-        WasSetFromHint = ring.WasSetFromHint(letter);
+        
+        WasSetFromHint = isHint;
     }
 
     public Unit SolveLetter(char decodedLetter)

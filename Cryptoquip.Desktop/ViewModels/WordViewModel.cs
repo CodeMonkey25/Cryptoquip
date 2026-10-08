@@ -43,7 +43,7 @@ public class WordViewModel : ViewModelBase
         SolveWordCommand = ReactiveCommand.Create<string, Unit>(SolveWord);
     }
 
-    public WordViewModel(string word, Dictionary<char, LetterViewModel> letterMap) : this()
+    public WordViewModel(string word, Dictionary<char, LetterViewModel> letterMap, IReadOnlySet<char> hints) : this()
     {
         foreach (char c in word)
         {
@@ -54,7 +54,7 @@ public class WordViewModel : ViewModelBase
             }
             else
             {
-                vm = new LetterViewModel(c);
+                vm = new LetterViewModel(c, hints.Contains(c));
                 letterMap.Add(c, vm);
             }
 

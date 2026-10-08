@@ -57,7 +57,6 @@ public class DecoderRingTests
             Assert.Equal('-', ring.Get(c));
             Assert.False(ring.Contains(c));
             Assert.False(ring.UsedContains(c));
-            Assert.False(ring.WasSetFromHint(c));
         });
     }
 
@@ -410,110 +409,59 @@ public class DecoderRingTests
 
     #endregion
 
-    #region Hints
+    #region Put (Dictionary)
 
     [Theory]
     [MemberData(nameof(RingTypes))]
-    public void LoadHints_MapsAndMarksLetters(Type type)
+    public void Put_Dictionary_MapsAllLetters(Type type)
     {
         DecoderRing ring = Create(type);
 
-        ring.LoadHints(Hints("XYZ", "THE"));
+        ring.Put(Hints("XYZ", "THE"));
 
         Assert.Equal("THE", ring.Decode("XYZ".AsMemory()));
-        Assert.All("XYZ", c => Assert.True(ring.WasSetFromHint(c)));
         Assert.Equal(3, ring.SolveCount);
+        Assert.Equal('T', ring.Get('X'));
+        Assert.Equal('H', ring.Get('Y'));
+        Assert.Equal('E', ring.Get('Z'));
     }
 
     [Theory]
     [MemberData(nameof(RingTypes))]
-    public void LoadHints_Empty_LoadsNothing(Type type)
+    public void Put_Dictionary_Empty_MapsNothing(Type type)
     {
         DecoderRing ring = Create(type);
 
-        ring.LoadHints(new Dictionary<char, char>());
+        ring.Put(new Dictionary<char, char>());
 
         Assert.Equal(0, ring.SolveCount);
-        Assert.All(Alphabet, c => Assert.False(ring.WasSetFromHint(c)));
+        Assert.Empty(ring.GetMatches());
     }
 
     [Theory]
     [MemberData(nameof(RingTypes))]
-    public void LoadHints_Punctuation_IsNotMappedOrMarked(Type type)
+    public void Put_Dictionary_Punctuation_IsNotMapped(Type type)
     {
         DecoderRing ring = Create(type);
 
-        ring.LoadHints(Hints("XYZ'W", "DON'T"));
+        ring.Put(Hints("XYZ'W", "DON'T"));
 
         Assert.Equal("DON'T", ring.Decode("XYZ'W".AsMemory()));
         Assert.Equal(4, ring.SolveCount);
-        Assert.False(ring.WasSetFromHint('\''));
+        Assert.False(ring.Contains('\''));
     }
 
     [Theory]
     [MemberData(nameof(RingTypes))]
-    public void LoadHints_AlreadyMappedLetter_IsNotOverwrittenOrMarked(Type type)
+    public void Put_Dictionary_AlreadyMappedLetter_IsNotOverwritten(Type type)
     {
         DecoderRing ring = Create(type, "X", "Q");
 
-        ring.LoadHints(Hints("XY", "TH"));
+        ring.Put(Hints("XY", "TH"));
 
         Assert.Equal('Q', ring.Get('X'));
-        Assert.False(ring.WasSetFromHint('X'));
         Assert.Equal('H', ring.Get('Y'));
-        Assert.True(ring.WasSetFromHint('Y'));
-    }
-
-    [Theory]
-    [MemberData(nameof(RingTypes))]
-    public void LoadHints_ClearsPreviousHintFlagsButKeepsMappings(Type type)
-    {
-        DecoderRing ring = Create(type);
-        ring.LoadHints(Hints("X", "T"));
-
-        ring.LoadHints(Hints("Y", "H"));
-
-        Assert.Equal('T', ring.Get('X'));
-        Assert.False(ring.WasSetFromHint('X'));
-        Assert.Equal('H', ring.Get('Y'));
-        Assert.True(ring.WasSetFromHint('Y'));
-    }
-
-    [Theory]
-    [MemberData(nameof(RingTypes))]
-    public void ClearHints_RemovesHintFlagsButKeepsMappings(Type type)
-    {
-        DecoderRing ring = Create(type);
-        ring.LoadHints(Hints("XYZ", "THE"));
-
-        ring.ClearHints();
-
-        Assert.Equal("THE", ring.Decode("XYZ".AsMemory()));
-        Assert.All(Alphabet, c => Assert.False(ring.WasSetFromHint(c)));
-    }
-
-    [Theory]
-    [MemberData(nameof(RingTypes))]
-    public void WasSetFromHint_NonLetter_ReturnsFalse(Type type)
-    {
-        DecoderRing ring = Create(type);
-        ring.LoadHints(Hints("X", "T"));
-
-        Assert.False(ring.WasSetFromHint('\''));
-        Assert.False(ring.WasSetFromHint('x'));
-    }
-
-    [Theory]
-    [MemberData(nameof(RingTypes))]
-    public void RemoveHintedLetter_KeepsHintFlag(Type type)
-    {
-        DecoderRing ring = Create(type);
-        ring.LoadHints(Hints("X", "T"));
-
-        ring.Remove('X');
-
-        Assert.False(ring.Contains('X'));
-        Assert.True(ring.WasSetFromHint('X'));
+        Assert.Equal(2, ring.SolveCount);
     }
 
     #endregion
@@ -551,10 +499,10 @@ public class DecoderRingTests
 
     [Theory]
     [MemberData(nameof(RingTypes))]
-    public void Clear_RemovesMappingsAndHints(Type type)
+    public void Clear_RemovesMappings(Type type)
     {
         DecoderRing ring = Create(type);
-        ring.LoadHints(Hints("XYZ", "THE"));
+        ring.Put(Hints("XYZ", "THE"));
         ring.Put('Q', 'R');
 
         ring.Clear();
@@ -566,7 +514,6 @@ public class DecoderRingTests
         Assert.All(Alphabet, c =>
         {
             Assert.Equal('-', ring.Get(c));
-            Assert.False(ring.WasSetFromHint(c));
         });
     }
 
@@ -588,10 +535,10 @@ public class DecoderRingTests
 
     [Theory]
     [MemberData(nameof(RingTypes))]
-    public void Clone_CopiesMappingsAndHints(Type type)
+    public void Clone_CopiesMappings(Type type)
     {
         DecoderRing ring = Create(type, "Q", "R");
-        ring.LoadHints(Hints("XYZ", "THE"));
+        ring.Put(Hints("XYZ", "THE"));
 
         DecoderRing clone = ring.Clone();
 
@@ -600,8 +547,6 @@ public class DecoderRingTests
         Assert.Equal(MatchList(ring), MatchList(clone));
         Assert.Equal(UsedLetters(ring), UsedLetters(clone));
         Assert.Equal(4, clone.SolveCount);
-        Assert.All("XYZ", c => Assert.True(clone.WasSetFromHint(c)));
-        Assert.False(clone.WasSetFromHint('Q'));
     }
 
     [Theory]
@@ -621,31 +566,18 @@ public class DecoderRingTests
         Assert.False(clone.UsedContains('T'));
     }
 
-    [Theory]
-    [MemberData(nameof(RingTypes))]
-    public void Clone_ClearingCloneLeavesOriginalHints(Type type)
-    {
-        DecoderRing ring = Create(type);
-        ring.LoadHints(Hints("X", "T"));
-
-        ring.Clone().Clear();
-
-        Assert.True(ring.WasSetFromHint('X'));
-        Assert.Equal('T', ring.Get('X'));
-    }
-
     #endregion
 
     #region Overwrite
 
     [Theory]
     [MemberData(nameof(RingTypePairs))]
-    public void Overwrite_CopiesMappingsAndHintsFromAnyImplementation(Type targetType, Type sourceType)
+    public void Overwrite_CopiesMappingsFromAnyImplementation(Type targetType, Type sourceType)
     {
         DecoderRing source = Create(sourceType, "Q", "R");
-        source.LoadHints(Hints("XYZ", "THE"));
+        source.Put(Hints("XYZ", "THE"));
         DecoderRing target = Create(targetType, "B", "D");
-        target.LoadHints(Hints("A", "C"));
+        target.Put(Hints("A", "C"));
 
         target.Overwrite(source);
 
@@ -654,8 +586,6 @@ public class DecoderRingTests
         Assert.Equal(source.SolveCount, target.SolveCount);
         Assert.Equal('-', target.Get('A'));
         Assert.False(target.UsedContains('C'));
-        Assert.False(target.WasSetFromHint('A'));
-        Assert.All("XYZ", c => Assert.True(target.WasSetFromHint(c)));
     }
 
     [Theory]
@@ -678,13 +608,12 @@ public class DecoderRingTests
     public void Overwrite_WithEmptyRing_ClearsTarget(Type type)
     {
         DecoderRing target = Create(type, "Y", "H");
-        target.LoadHints(Hints("X", "T"));
+        target.Put(Hints("X", "T"));
 
         target.Overwrite(Create(type));
 
         Assert.Equal(0, target.SolveCount);
         Assert.Empty(target.GetUsedLetters());
-        Assert.False(target.WasSetFromHint('X'));
     }
 
     #endregion
@@ -735,14 +664,14 @@ public class DecoderRingTests
     }
 
     [Fact]
-    public void Null_LoadHints_LoadsNothing()
+    public void Null_PutDictionary_MapsNothing()
     {
         DecoderRingNull ring = new();
 
-        ring.LoadHints(Hints("XYZ", "THE"));
+        ring.Put(Hints("XYZ", "THE"));
 
         Assert.Equal(0, ring.SolveCount);
-        Assert.All("XYZ", c => Assert.False(ring.WasSetFromHint(c)));
+        Assert.Empty(ring.GetMatches());
     }
 
     [Fact]

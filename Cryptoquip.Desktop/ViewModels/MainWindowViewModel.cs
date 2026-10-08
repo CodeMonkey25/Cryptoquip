@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using Cryptoquip.Extensions;
 using Cryptoquip.Models;
 using Cryptoquip.Services;
@@ -25,13 +26,14 @@ public class MainWindowViewModel : ViewModelBase
         ring.Clear();
         
         Puzzle = Puzzle.Parse(text);
-        ring.LoadHints(Puzzle.Hints);
+        ring.Put(Puzzle.Hints);
         
         Words.Clear();
         Dictionary<char, LetterViewModel> letterMap = new();
+        HashSet<char> hints = Puzzle.Hints.Keys.ToHashSet();
         foreach (ReadOnlyMemory<char> word in Puzzle.GetAllWords())
         {
-            Words.Add(new WordViewModel(new string(word.Span), letterMap));
+            Words.Add(new WordViewModel(new string(word.Span), letterMap, hints));
         }
     }
 }

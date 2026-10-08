@@ -6,8 +6,6 @@ public abstract class DecoderRing
 {
     public static DecoderRing Build() => new DecoderRingBitmask();
     
-    protected internal uint Hints { get; protected set; }
-    
     public abstract int SolveCount { get; }
     public abstract char Get(char letter);
     public abstract IEnumerable<(char letter, char match)> GetMatches();
@@ -25,6 +23,14 @@ public abstract class DecoderRing
             count++;
         }
         return count;
+    }
+
+    public void Put(IReadOnlyDictionary<char, char> hints)
+    {
+        foreach ((char letter, char match) in hints)
+        {
+            Put(letter, match);
+        }
     }
     
     public virtual bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
@@ -53,24 +59,6 @@ public abstract class DecoderRing
         return true;
     }
 
-    public void LoadHints(IReadOnlyDictionary<char, char> hints)
-    {
-        ClearHints();
-        foreach ((char letter, char match) in hints)
-        {
-            if (Put(letter, match)) AddHint(letter);
-        }
-    }
-
-    private void AddHint(char letter)
-    {
-        if (char.IsAsciiLetterUpper(letter)) Hints |= 1u << (letter - 'A');
-    }
-    
-    public void ClearHints() => Hints = 0;
-
-    public bool WasSetFromHint(char letter) => char.IsAsciiLetterUpper(letter) && (Hints & (1u << (letter - 'A'))) != 0;
-
     public string Decode(ReadOnlyMemory<char> message) => string.Concat(message.Select(Get));
     
     public abstract void Remove(char letter);
@@ -86,10 +74,7 @@ public abstract class DecoderRing
     public abstract bool Contains(char letter);
     public abstract bool UsedContains(char letter);
 
-    public virtual void Clear()
-    {
-        ClearHints();
-    }
+    public abstract void Clear();
 
     public abstract IEnumerable<char> GetUsedLetters();
     
@@ -110,6 +95,5 @@ public abstract class DecoderRing
         {
             Put(letter, match);
         }
-        Hints = other.Hints;
     }
 }

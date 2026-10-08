@@ -50,7 +50,6 @@ public sealed class DecoderRingDictionary : DecoderRing
     public override void Clear()
     {
         _map.Clear();
-        base.Clear();
     }
 
     public override DecoderRing Clone()
@@ -58,7 +57,6 @@ public sealed class DecoderRingDictionary : DecoderRing
         return new DecoderRingDictionary
         {
             _map = new(this._map),
-            Hints = this.Hints,
         };
     }
 }

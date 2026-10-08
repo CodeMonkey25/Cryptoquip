@@ -101,7 +101,6 @@ public sealed class DecoderRingBitmask : DecoderRing
         _usedLetters = 0;
         _mappedLetters = 0;
         _solveCount = 0;
-        base.Clear();
     }
 
     public override DecoderRing Clone()
@@ -109,7 +108,6 @@ public sealed class DecoderRingBitmask : DecoderRing
         return new DecoderRingBitmask()
         {
             _cypher = this._cypher.ToArray(),
-            Hints = this.Hints,
             _usedLetters = this._usedLetters,
             _mappedLetters = this._mappedLetters,
             _solveCount = this._solveCount,
@@ -124,7 +122,6 @@ public sealed class DecoderRingBitmask : DecoderRing
             _usedLetters = otherBitmask._usedLetters;
             _mappedLetters = otherBitmask._mappedLetters;
             _solveCount = otherBitmask._solveCount;
-            Hints = other.Hints;
         }
         else
         {
