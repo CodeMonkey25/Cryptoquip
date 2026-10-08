@@ -59,8 +59,24 @@ public abstract class DecoderRing
         return true;
     }
 
-    public string Decode(ReadOnlyMemory<char> message) => string.Concat(message.Select(Get));
-    
+    public string Decode(ReadOnlyMemory<char> message)
+    {
+        if (message.IsEmpty) return string.Empty;
+
+        return string.Create(
+            message.Length,
+            (ring: this, message),
+            static (span, state) =>
+            {
+                DecoderRing ring = state.ring;
+                ReadOnlySpan<char> message = state.message.Span;
+                for (int i = 0; i < message.Length; i++)
+                {
+                    span[i] = ring.Get(message[i]);
+                }
+            });
+    }
+
     public abstract void Remove(char letter);
 
     public void Remove(Span<char> letters)
@@ -80,7 +96,7 @@ public abstract class DecoderRing
     
     public virtual IEnumerable<char> GetUnusedLetters()
     {
-        uint used = GetUsedLetters().Aggregate<char, uint>(0, (current, c) => current | 1u << (c - 'A'));
+        uint used = GetUsedLetters().Aggregate<char, uint>(0, (mask, c) => mask | 1u << (c - 'A'));
 
         for (int i = 0; i < 26; i++)
         {
