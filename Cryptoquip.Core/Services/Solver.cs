@@ -4,7 +4,7 @@ namespace Cryptoquip.Services;
 
 public class Solver
 {
-    public void Run(Action<string> logMessage, Puzzle puzzle, DecoderRing ring, WordList? wordList = null, bool enableExclusionAnalysis = false)
+    public void Run(Action<string> logMessage, Puzzle puzzle, IDecoderRing ring, WordList? wordList = null, bool enableExclusionAnalysis = false)
     {
         logMessage($"Received puzzle: {puzzle.Text}");
         logMessage(string.Empty);
@@ -67,7 +67,7 @@ public class Solver
             startIndex++;
         }
 
-        DecoderRing partialSolution = ring.Clone();
+        IDecoderRing partialSolution = ring.Clone();
         if (!SolveRecursively(words.AsSpan(startIndex), ring, partialSolution))
         {
             logMessage("Could not find a solution. Printing the best attempt.");
@@ -78,7 +78,7 @@ public class Solver
         logMessage(ring.Decode(puzzle.Text));
     }
     
-    private bool SolveRecursively(Span<Word> words, DecoderRing ring, DecoderRing partialSolution)
+    private bool SolveRecursively(Span<Word> words, IDecoderRing ring, IDecoderRing partialSolution)
     {
         // if words is empty, we must have solved it...
         if (words.IsEmpty) return true;
@@ -130,7 +130,7 @@ public class Solver
         return false;
     }
 
-    private bool SolveIteratively(Span<Word> words, DecoderRing ring, DecoderRing partialSolution)
+    private bool SolveIteratively(Span<Word> words, IDecoderRing ring, IDecoderRing partialSolution)
     {
         int depth = 0;
         

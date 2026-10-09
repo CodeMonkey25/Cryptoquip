@@ -22,7 +22,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public void LoadPuzzle(string text)
     {
-        DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
+        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
         ring.Clear();
         
         Puzzle = Puzzle.Parse(text);

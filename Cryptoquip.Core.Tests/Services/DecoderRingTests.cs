@@ -1,3 +1,4 @@
+using System.Reflection;
 using Cryptoquip.Services;
 
 namespace Cryptoquip.Tests.Services;
@@ -25,20 +26,23 @@ public class DecoderRingTests
         }
     }
 
-    private static DecoderRing Create(Type type) => (DecoderRing)Activator.CreateInstance(type)!;
-
-    private static DecoderRing Create(Type type, string letters, string matches)
+    private static IDecoderRing Create(Type type)
     {
-        DecoderRing ring = Create(type);
+        return (IDecoderRing)type.GetMethod("Create", BindingFlags.Public | BindingFlags.Static).Invoke(null, null);
+    }
+
+    private static IDecoderRing Create(Type type, string letters, string matches)
+    {
+        IDecoderRing ring = Create(type);
         for (int i = 0; i < letters.Length; i++) ring.Put(letters[i], matches[i]);
         return ring;
     }
 
     private static Dictionary<char, char> Hints(string letters, string matches) => letters.Zip(matches).ToDictionary();
 
-    private static List<(char letter, char match)> MatchList(DecoderRing ring) => ring.GetMatches().ToList();
+    private static List<(char letter, char match)> MatchList(IDecoderRing ring) => ring.GetMatches().ToList();
 
-    private static string UsedLetters(DecoderRing ring) => string.Concat(ring.GetUsedLetters());
+    private static string UsedLetters(IDecoderRing ring) => string.Concat(ring.GetUsedLetters());
 
     #region New ring
 
@@ -46,7 +50,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void NewRing_IsEmpty(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         Assert.Equal(0, ring.SolveCount);
         Assert.Empty(ring.GetMatches());
@@ -68,7 +72,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_NewLetter_MapsItAndReturnsTrue(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         Assert.True(ring.Put('X', 'T'));
 
@@ -84,7 +88,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_AlreadyMappedLetter_KeepsOriginalAndReturnsFalse(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
 
         Assert.False(ring.Put('X', 'Q'));
 
@@ -97,7 +101,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_LetterToItself_IsAllowed(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         Assert.True(ring.Put('A', 'A'));
         Assert.Equal('A', ring.Get('A'));
@@ -107,7 +111,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_BoundaryLetters_AreMapped(Type type)
     {
-        DecoderRing ring = Create(type, "AZ", "ZA");
+        IDecoderRing ring = Create(type, "AZ", "ZA");
 
         Assert.Equal('Z', ring.Get('A'));
         Assert.Equal('A', ring.Get('Z'));
@@ -118,7 +122,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_AllLetters_SolvesEverything(Type type)
     {
-        DecoderRing ring = Create(type, Alphabet, "ZYXWVUTSRQPONMLKJIHGFEDCBA");
+        IDecoderRing ring = Create(type, Alphabet, "ZYXWVUTSRQPONMLKJIHGFEDCBA");
 
         Assert.Equal(26, ring.SolveCount);
         Assert.Equal(Alphabet, UsedLetters(ring));
@@ -129,7 +133,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_InvalidCharacters_ReturnsFalseAndChangesNothing(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         Assert.False(ring.Put('\'', 'A'));
         Assert.False(ring.Put('A', '\''));
@@ -145,7 +149,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Get_NonLetter_ReturnsItUnchanged(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
 
         Assert.Equal('\'', ring.Get('\''));
         Assert.Equal(' ', ring.Get(' '));
@@ -157,7 +161,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Contains_NonLetter_ReturnsFalse(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
 
         Assert.False(ring.Contains('\''));
         Assert.False(ring.Contains('x'));
@@ -172,7 +176,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void PutSpans_MapsEachPairAndReturnsCount(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         int added = ring.Put("XYZ", "THE");
 
@@ -184,7 +188,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void PutSpans_SkipsAlreadyMappedAndRepeatedLetters(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
 
         int added = ring.Put("XYYZ", "TOOK");
 
@@ -196,7 +200,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void PutSpans_SkipsNonLetters(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         int added = ring.Put("XYZ'W", "DON'T");
 
@@ -208,7 +212,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void PutSpans_TracksOnlyNewlyAddedLetters(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
         char[] addedLetters = new char[5];
 
         int added = ring.Put("XYYZ'", "TOOK'", addedLetters);
@@ -224,7 +228,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Remove_MappedLetter_UnmapsItAndFreesMatch(Type type)
     {
-        DecoderRing ring = Create(type, "XY", "TH");
+        IDecoderRing ring = Create(type, "XY", "TH");
 
         ring.Remove('X');
 
@@ -239,7 +243,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Remove_ThenPut_RemapsLetter(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
 
         ring.Remove('X');
 
@@ -252,7 +256,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Remove_UnmappedOrInvalidLetter_ChangesNothing(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
 
         ring.Remove('Y');
         ring.Remove('\'');
@@ -267,7 +271,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Remove_Twice_OnlyDecrementsOnce(Type type)
     {
-        DecoderRing ring = Create(type, "XY", "TH");
+        IDecoderRing ring = Create(type, "XY", "TH");
 
         ring.Remove('X');
         ring.Remove('X');
@@ -279,7 +283,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void RemoveSpan_RemovesEachLetter(Type type)
     {
-        DecoderRing ring = Create(type, "XYZ", "THE");
+        IDecoderRing ring = Create(type, "XYZ", "THE");
 
         ring.Remove("XZ".ToCharArray());
 
@@ -292,7 +296,7 @@ public class DecoderRingTests
     public void PutSpansThenRemoveAddedLetters_RestoresPreviousState(Type type)
     {
         // the solver's backtracking pattern
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
         char[] addedLetters = new char[4];
 
         int added = ring.Put("XYZW", "THEN", addedLetters);
@@ -311,7 +315,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void GetMatches_ReturnsAllMappingsInLetterOrder(Type type)
     {
-        DecoderRing ring = Create(type, "ZXY", "EHT");
+        IDecoderRing ring = Create(type, "ZXY", "EHT");
 
         Assert.Equal([('X', 'H'), ('Y', 'T'), ('Z', 'E')], ring.GetMatches());
     }
@@ -320,7 +324,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void GetUsedLetters_ReturnsMatchedPlainLettersInAlphabeticalOrder(Type type)
     {
-        DecoderRing ring = Create(type, "ZXY", "EHT");
+        IDecoderRing ring = Create(type, "ZXY", "EHT");
 
         Assert.Equal("EHT", UsedLetters(ring));
     }
@@ -329,8 +333,8 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void GetMatchesAndGetUsedLetters_OrderIsIndependentOfInsertionOrder(Type type)
     {
-        DecoderRing forward = Create(type, "QRSTU", "VWXYZ");
-        DecoderRing backward = Create(type, "UTSRQ", "ZYXWV");
+        IDecoderRing forward = Create(type, "QRSTU", "VWXYZ");
+        IDecoderRing backward = Create(type, "UTSRQ", "ZYXWV");
 
         Assert.Equal(forward.GetMatches(), backward.GetMatches());
         Assert.Equal(UsedLetters(forward), UsedLetters(backward));
@@ -340,7 +344,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void GetUnusedLetters_ReturnsComplementInAlphabeticalOrder(Type type)
     {
-        DecoderRing ring = Create(type, "ZXYW", "EHTA");
+        IDecoderRing ring = Create(type, "ZXYW", "EHTA");
 
         Assert.Equal("BCDFGIJKLMNOPQRSUVWXYZ", string.Concat(ring.GetUnusedLetters()));
     }
@@ -353,7 +357,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Matches_EmptyRing_AllowsAnyCandidate(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         Assert.True(ring.Matches("XYZ", "THE"));
         Assert.True(ring.Matches("XYZ", "XYZ"));
@@ -363,7 +367,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Matches_MappedLetter_RequiresSameMatch(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
 
         Assert.True(ring.Matches("XYZ", "THE"));
         Assert.False(ring.Matches("XYZ", "CAT"));
@@ -373,7 +377,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Matches_UnmappedLetter_CannotUseAlreadyUsedMatch(Type type)
     {
-        DecoderRing ring = Create(type, "Q", "C"); // C is taken by Q
+        IDecoderRing ring = Create(type, "Q", "C"); // C is taken by Q
 
         Assert.True(ring.Matches("XYZ", "DOG"));
         Assert.False(ring.Matches("XYZ", "CAT"));
@@ -384,7 +388,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Matches_FullyMappedWord_RequiresExactDecoding(Type type)
     {
-        DecoderRing ring = Create(type, "XYZ", "THE");
+        IDecoderRing ring = Create(type, "XYZ", "THE");
 
         Assert.True(ring.Matches("ZYX", "EHT"));
         Assert.False(ring.Matches("ZYX", "THE"));
@@ -394,7 +398,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Matches_PunctuationInSamePosition_IsAllowed(Type type)
     {
-        DecoderRing ring = Create(type, "W", "T");
+        IDecoderRing ring = Create(type, "W", "T");
 
         Assert.True(ring.Matches("XYZ'W", "DON'T"));
         Assert.False(ring.Matches("XYZ'W", "DON'S"));
@@ -415,7 +419,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_Dictionary_MapsAllLetters(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         ring.Put(Hints("XYZ", "THE"));
 
@@ -430,7 +434,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_Dictionary_Empty_MapsNothing(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         ring.Put(new Dictionary<char, char>());
 
@@ -442,7 +446,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_Dictionary_Punctuation_IsNotMapped(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
 
         ring.Put(Hints("XYZ'W", "DON'T"));
 
@@ -455,7 +459,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Put_Dictionary_AlreadyMappedLetter_IsNotOverwritten(Type type)
     {
-        DecoderRing ring = Create(type, "X", "Q");
+        IDecoderRing ring = Create(type, "X", "Q");
 
         ring.Put(Hints("XY", "TH"));
 
@@ -472,7 +476,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Decode_MapsKnownLettersAndDashesUnknown(Type type)
     {
-        DecoderRing ring = Create(type, "XZ", "TE");
+        IDecoderRing ring = Create(type, "XZ", "TE");
 
         Assert.Equal("T-E", ring.Decode("XYZ".AsMemory()));
     }
@@ -481,7 +485,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Decode_PreservesNonLetters(Type type)
     {
-        DecoderRing ring = Create(type, "XYZWQ", "DONTG");
+        IDecoderRing ring = Create(type, "XYZWQ", "DONTG");
 
         Assert.Equal("DON'T GO, \"DON\"!", ring.Decode("XYZ'W QY, \"XYZ\"!".AsMemory()));
     }
@@ -501,7 +505,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Clear_RemovesMappings(Type type)
     {
-        DecoderRing ring = Create(type);
+        IDecoderRing ring = Create(type);
         ring.Put(Hints("XYZ", "THE"));
         ring.Put('Q', 'R');
 
@@ -521,7 +525,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Clear_CanBeReusedAfterwards(Type type)
     {
-        DecoderRing ring = Create(type, "X", "T");
+        IDecoderRing ring = Create(type, "X", "T");
         ring.Clear();
 
         Assert.True(ring.Put('X', 'Q'));
@@ -537,10 +541,10 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Clone_CopiesMappings(Type type)
     {
-        DecoderRing ring = Create(type, "Q", "R");
+        IDecoderRing ring = Create(type, "Q", "R");
         ring.Put(Hints("XYZ", "THE"));
 
-        DecoderRing clone = ring.Clone();
+        IDecoderRing clone = ring.Clone();
 
         Assert.IsType(type, clone);
         Assert.NotSame(ring, clone);
@@ -553,8 +557,8 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Clone_IsIndependentOfOriginal(Type type)
     {
-        DecoderRing ring = Create(type, "XY", "TH");
-        DecoderRing clone = ring.Clone();
+        IDecoderRing ring = Create(type, "XY", "TH");
+        IDecoderRing clone = ring.Clone();
 
         clone.Put('Z', 'E');
         clone.Remove('X');
@@ -574,9 +578,9 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypePairs))]
     public void Overwrite_CopiesMappingsFromAnyImplementation(Type targetType, Type sourceType)
     {
-        DecoderRing source = Create(sourceType, "Q", "R");
+        IDecoderRing source = Create(sourceType, "Q", "R");
         source.Put(Hints("XYZ", "THE"));
-        DecoderRing target = Create(targetType, "B", "D");
+        IDecoderRing target = Create(targetType, "B", "D");
         target.Put(Hints("A", "C"));
 
         target.Overwrite(source);
@@ -592,8 +596,8 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypePairs))]
     public void Overwrite_TargetIsIndependentOfSource(Type targetType, Type sourceType)
     {
-        DecoderRing source = Create(sourceType, "XY", "TH");
-        DecoderRing target = Create(targetType);
+        IDecoderRing source = Create(sourceType, "XY", "TH");
+        IDecoderRing target = Create(targetType);
         target.Overwrite(source);
 
         target.Put('Z', 'E');
@@ -607,7 +611,7 @@ public class DecoderRingTests
     [MemberData(nameof(RingTypes))]
     public void Overwrite_WithEmptyRing_ClearsTarget(Type type)
     {
-        DecoderRing target = Create(type, "Y", "H");
+        IDecoderRing target = Create(type, "Y", "H");
         target.Put(Hints("X", "T"));
 
         target.Overwrite(Create(type));
@@ -623,7 +627,7 @@ public class DecoderRingTests
     [Fact]
     public void Null_NeverStoresMappings()
     {
-        DecoderRingNull ring = new();
+        IDecoderRing ring = DecoderRingNull.Create();
 
         Assert.False(ring.Put('X', 'T'));
         Assert.Equal(0, ring.Put("XYZ", "THE"));
@@ -642,7 +646,7 @@ public class DecoderRingTests
     [Fact]
     public void Null_GetNonLetter_ReturnsItUnchanged()
     {
-        DecoderRingNull ring = new();
+        IDecoderRing ring = DecoderRingNull.Create();
 
         Assert.Equal('\'', ring.Get('\''));
         Assert.Equal('x', ring.Get('x'));
@@ -651,7 +655,7 @@ public class DecoderRingTests
     [Fact]
     public void Null_MatchesAnyCandidate()
     {
-        DecoderRingNull ring = new();
+        IDecoderRing ring = DecoderRingNull.Create();
 
         Assert.True(ring.Matches("XYZ", "THE"));
         Assert.True(ring.Matches("XYZ'W", "DON'T"));
@@ -660,13 +664,13 @@ public class DecoderRingTests
     [Fact]
     public void Null_DecodesLettersAsDashes()
     {
-        Assert.Equal("---'- --!", new DecoderRingNull().Decode("XYZ'W QY!".AsMemory()));
+        Assert.Equal("---'- --!", DecoderRingNull.Create().Decode("XYZ'W QY!".AsMemory()));
     }
 
     [Fact]
     public void Null_PutDictionary_MapsNothing()
     {
-        DecoderRingNull ring = new();
+        IDecoderRing ring = DecoderRingNull.Create();
 
         ring.Put(Hints("XYZ", "THE"));
 
@@ -677,7 +681,7 @@ public class DecoderRingTests
     [Fact]
     public void Null_RemoveAndClear_DoNothing()
     {
-        DecoderRingNull ring = new();
+        IDecoderRing ring = DecoderRingNull.Create();
 
         ring.Remove('X');
         ring.Remove("XY".ToCharArray());
@@ -689,7 +693,7 @@ public class DecoderRingTests
     [Fact]
     public void Null_Clone_ReturnsSameInstance()
     {
-        DecoderRingNull ring = new();
+        IDecoderRing ring = DecoderRingNull.Create();
 
         Assert.Same(ring, ring.Clone());
     }

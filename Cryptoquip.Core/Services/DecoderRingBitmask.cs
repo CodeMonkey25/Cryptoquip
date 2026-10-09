@@ -3,17 +3,21 @@ using System.Runtime.CompilerServices;
 
 namespace Cryptoquip.Services;
 
-public sealed class DecoderRingBitmask : DecoderRing
+public sealed class DecoderRingBitmask : IDecoderRing
 {
+    public static IDecoderRing Create() => new DecoderRingBitmask();
+
+    private DecoderRingBitmask() { }
+    
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
     private uint _usedLetters;
     private uint _mappedLetters;
     private int _solveCount;
 
-    public override int SolveCount => _solveCount;
-
+    public int SolveCount => _solveCount;
+    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Put(char letter, char match)
+    public bool Put(char letter, char match)
     {
         uint l = (uint)(letter - 'A');
         uint m = (uint)(match - 'A');
@@ -31,13 +35,13 @@ public sealed class DecoderRingBitmask : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override char Get(char letter)
+    public char Get(char letter)
     {
         uint i = (uint)(letter - 'A');
         return i < 26u ? _cypher[i] : letter;
     }
 
-    public override IEnumerable<(char letter, char match)> GetMatches()
+    public IEnumerable<(char letter, char match)> GetMatches()
     {
         uint mapped = _mappedLetters;
         while (mapped != 0)
@@ -49,7 +53,7 @@ public sealed class DecoderRingBitmask : DecoderRing
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override void Remove(char letter)
+    public void Remove(char letter)
     {
         uint i = (uint)(letter - 'A');
         if (i < 26u)
@@ -71,13 +75,13 @@ public sealed class DecoderRingBitmask : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Contains(char letter)
+    public bool Contains(char letter)
     {
         uint i = (uint)(letter - 'A');
         return i < 26u && (_mappedLetters & (1u << (int)i)) != 0;
     }
 
-    public override IEnumerable<char> GetUsedLetters()
+    public IEnumerable<char> GetUsedLetters()
     {
         uint used = _usedLetters;
         while (used != 0)
@@ -89,13 +93,13 @@ public sealed class DecoderRingBitmask : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool UsedContains(char letter)
+    public bool UsedContains(char letter)
     {
         uint i = (uint)(letter - 'A');
         return i < 26u && (_usedLetters & (1u << (int)i)) != 0;
     }
 
-    public override void Clear()
+    public void Clear()
     {
         Array.Fill(_cypher, '-');
         _usedLetters = 0;
@@ -103,7 +107,7 @@ public sealed class DecoderRingBitmask : DecoderRing
         _solveCount = 0;
     }
 
-    public override DecoderRing Clone()
+    public IDecoderRing Clone()
     {
         return new DecoderRingBitmask()
         {
@@ -114,7 +118,7 @@ public sealed class DecoderRingBitmask : DecoderRing
         };
     }
 
-    public override void Overwrite(DecoderRing other)
+    public void Overwrite(IDecoderRing other)
     {
         if (other is DecoderRingBitmask otherBitmask)
         {
@@ -125,12 +129,16 @@ public sealed class DecoderRingBitmask : DecoderRing
         }
         else
         {
-            base.Overwrite(other);
+            Clear();
+            foreach (var (letter, match) in other.GetMatches())
+            {
+                Put(letter, match);
+            }
         }
     }
 
     // overriding this for performance, it should mirror the base class's logic
-    public override bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
+    public bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
     {
         for (int i = 0; i < encrypted.Length; i++)
         {
@@ -158,8 +166,7 @@ public sealed class DecoderRingBitmask : DecoderRing
         return true;
     }
     
-    // overriding this for performance, it should mirror the base class's logic
-    public override IEnumerable<char> GetUnusedLetters()
+    public IEnumerable<char> GetUnusedLetters()
     {
         uint unused = ~_usedLetters & 0x03FFFFFFu;
         while (unused != 0)

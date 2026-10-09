@@ -110,7 +110,7 @@ public class WordList
         //     .ToDictionary(static g => g.Key, static g => g.Select(w => w.Word).ToArray(), comparer);
     }
 
-    public List<string> GetMatches(Word word, DecoderRing ring)
+    public List<string> GetMatches(Word word, IDecoderRing ring)
     {
         if (!_words.TryGetValue(word.Pattern, out List<string>? candidates))
             return [];

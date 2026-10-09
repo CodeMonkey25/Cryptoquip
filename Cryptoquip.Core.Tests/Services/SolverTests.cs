@@ -1,3 +1,4 @@
+using System.Reflection;
 using Cryptoquip.Models;
 using Cryptoquip.Services;
 
@@ -5,7 +6,7 @@ namespace Cryptoquip.Tests.Services;
 
 /// <remarks>
 /// These tests run against the small dictionary.txt in this project. The words relevant here are
-/// A, I, AN, AT, TO, BEE, SEE, TEE, TOO, ZOO, CAT, DOG, THE, NOON, BOOK, LOOK, TOOK, CAN'T and DON'T.
+/// A, I, AN, AT, TO, BEE, SEE, TEE, TOO, ZOO, CAT, DOG, THE, NOON, BOOK, LOOK, TOOK, CAN'T, and DON'T.
 /// </remarks>
 public class SolverTests
 {
@@ -19,10 +20,15 @@ public class SolverTests
         typeof(DecoderRingDictionary),
     ];
 
-    private static (List<string> log, DecoderRing ring) Solve(string text, DecoderRing? ring = null, WordList? wordList = null, bool enableExclusionAnalysis = false)
+    private static IDecoderRing CreateRing(Type ringType)
+    {
+        return (IDecoderRing)ringType.GetMethod("Create", BindingFlags.Public | BindingFlags.Static).Invoke(null, null);
+    }
+
+    private static (List<string> log, IDecoderRing ring) Solve(string text, IDecoderRing? ring = null, WordList? wordList = null, bool enableExclusionAnalysis = false)
     {
         Puzzle puzzle = Puzzle.Parse(text);
-        ring ??= DecoderRing.Build();
+        ring ??= IDecoderRing.Create();
         ring.Put(puzzle.Hints);
         List<string> log = [];
 
@@ -37,7 +43,7 @@ public class SolverTests
     [MemberData(nameof(RingTypes))]
     public void Run_SingleCandidateWord_SolvesIt(Type ringType)
     {
-        (List<string> log, DecoderRing ring) = Solve("XYYX", (DecoderRing)Activator.CreateInstance(ringType)!);
+        (List<string> log, IDecoderRing ring) = Solve("XYYX", CreateRing(ringType)!);
 
         Assert.Equal("NOON", log[^1]);
         Assert.Equal([('X', 'N'), ('Y', 'O')], ring.GetMatches());
@@ -49,7 +55,7 @@ public class SolverTests
     public void Run_SharedLetters_FindsConsistentSolution(Type ringType)
     {
         // XYZ and QRX are both CAT/DOG/THE; only THE + CAT agree on X
-        (List<string> log, _) = Solve("XYZ QRX", (DecoderRing)Activator.CreateInstance(ringType)!);
+        (List<string> log, _) = Solve("XYZ QRX", CreateRing(ringType)!);
 
         Assert.Equal("THE CAT", log[^1]);
         Assert.DoesNotContain(NoSolutionMessage, log);
@@ -60,7 +66,7 @@ public class SolverTests
     public void Run_FirstCandidatesFail_BacktracksToSolution(Type ringType)
     {
         // ABC is tried first; CAT and DOG leave no match for DEA, so the solver must back out of both
-        (List<string> log, DecoderRing ring) = Solve("ABC DEA", (DecoderRing)Activator.CreateInstance(ringType)!);
+        (List<string> log, IDecoderRing ring) = Solve("ABC DEA", CreateRing(ringType)!);
 
         Assert.Equal("THE CAT", log[^1]);
         Assert.Equal([('A', 'T'), ('B', 'H'), ('C', 'E'), ('D', 'C'), ('E', 'A')], ring.GetMatches());
@@ -77,7 +83,7 @@ public class SolverTests
     [Fact]
     public void Run_Hint_NarrowsSolution()
     {
-        (List<string> log, DecoderRing ring) = Solve("XYZ <HINT>: X=D");
+        (List<string> log, IDecoderRing ring) = Solve("XYZ <HINT>: X=D");
 
         Assert.Equal("DOG", log[^1]);
         Assert.Equal('D', ring.Get('X'));
@@ -139,7 +145,7 @@ public class SolverTests
     [Fact]
     public void Run_OnlyUnsolvableWords_PrintsUndecodedPuzzle()
     {
-        (List<string> log, DecoderRing ring) = Solve("QQQ");
+        (List<string> log, IDecoderRing ring) = Solve("QQQ");
 
         Assert.Equal("---", log[^1]);
         Assert.Equal(0, ring.SolveCount);
@@ -150,7 +156,7 @@ public class SolverTests
     public void Run_NoConsistentSolution_RestoresBestPartialAttempt(Type ringType)
     {
         // QYZ and XYZ must both end in the same two letters, which no pair of dictionary words does
-        (List<string> log, DecoderRing ring) = Solve("XYZ QYZ", (DecoderRing)Activator.CreateInstance(ringType)!);
+        (List<string> log, IDecoderRing ring) = Solve("XYZ QYZ", CreateRing(ringType)!);
 
         Assert.Contains(NoSolutionMessage, log);
         Assert.Equal("-AT CAT", log[^1]);
@@ -160,7 +166,7 @@ public class SolverTests
     [Fact]
     public void Run_HintConflictingWithEveryCandidate_LeavesOnlyTheHint()
     {
-        (List<string> log, DecoderRing ring) = Solve("XYZ <HINT>: X=Q");
+        (List<string> log, IDecoderRing ring) = Solve("XYZ <HINT>: X=Q");
 
         Assert.Contains("The word 'XYZ' is unsolvable - skipping this word", log);
         Assert.Equal("Q--", log[^1]);
@@ -224,7 +230,7 @@ public class SolverTests
     [MemberData(nameof(RingTypes))]
     public void Run_ExclusionAnalysisEnabled_PrunesMatchesAndSolves(Type ringType)
     {
-        (List<string> log, _) = Solve("XYZ QRX", (DecoderRing)Activator.CreateInstance(ringType)!, enableExclusionAnalysis: true);
+        (List<string> log, _) = Solve("XYZ QRX", CreateRing(ringType)!, enableExclusionAnalysis: true);
 
         Assert.Contains("Performing exclusion analysis...", log);
         Assert.Contains("Deleted 4 words...", log);

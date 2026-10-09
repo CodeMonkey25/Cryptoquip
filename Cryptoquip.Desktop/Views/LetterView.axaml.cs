@@ -38,7 +38,7 @@ public partial class LetterView : UserControl
         if (!char.IsAsciiLetterUpper(vm.Letter)) return;
         if (vm.WasSetFromHint) return;
         
-        DecoderRing ring = Locator.Current.GetRequiredService<DecoderRing>();
+        IDecoderRing ring = Locator.Current.GetRequiredService<IDecoderRing>();
 
         MenuFlyout flyout = new MenuFlyout()
         {

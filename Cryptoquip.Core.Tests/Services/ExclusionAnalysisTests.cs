@@ -223,7 +223,7 @@ public class ExclusionAnalysisTests
         // XYZ is CAT/DOG/THE, ZWW is BEE/SEE/TEE/TOO/ZOO; the shared Z can only be T
         WordList wordList = new();
         Word[] words = [new("XYZ"), new("ZWW")];
-        foreach (Word word in words) word.Matches = wordList.GetMatches(word, new DecoderRingNull());
+        foreach (Word word in words) word.Matches = wordList.GetMatches(word, DecoderRingNull.Create());
 
         int deleted = new ExclusionAnalysis().Run(words);
 

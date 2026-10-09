@@ -1,3 +1,4 @@
+using System.Reflection;
 using Cryptoquip.Models;
 using Cryptoquip.Services;
 
@@ -33,7 +34,10 @@ public class WordListTests
         typeof(DecoderRingDictionary),
     ];
 
-    private static DecoderRing CreateRing(Type ringType) => (DecoderRing)Activator.CreateInstance(ringType)!;
+    private static IDecoderRing CreateRing(Type ringType)
+    {
+        return (IDecoderRing)ringType.GetMethod("Create", BindingFlags.Public | BindingFlags.Static).Invoke(null, null);
+    }
 
     [Fact]
     public void Constructor_NoPatterns_LoadsAllWordsGroupedByPattern()
@@ -139,7 +143,7 @@ public class WordListTests
     {
         WordList wordList = new();
 
-        Assert.Equal(wordList.Words[pattern], wordList.GetMatches(new Word(encrypted), new DecoderRingNull()));
+        Assert.Equal(wordList.Words[pattern], wordList.GetMatches(new Word(encrypted), DecoderRingNull.Create()));
     }
 
     [Theory]
@@ -151,7 +155,7 @@ public class WordListTests
         WordList wordList = new();
 
         Assert.DoesNotContain(Word.MakePattern(encrypted), wordList.Words.Keys);
-        Assert.Empty(wordList.GetMatches(new Word(encrypted), new DecoderRingNull()));
+        Assert.Empty(wordList.GetMatches(new Word(encrypted), DecoderRingNull.Create()));
     }
 
     [Fact]
@@ -159,7 +163,7 @@ public class WordListTests
     {
         WordList wordList = new();
 
-        List<string> matches = wordList.GetMatches(new Word("XYZ"), new DecoderRingNull());
+        List<string> matches = wordList.GetMatches(new Word("XYZ"), DecoderRingNull.Create());
         matches.Clear();
 
         Assert.NotSame(wordList.Words["ABC"], matches);
@@ -171,7 +175,7 @@ public class WordListTests
     public void GetMatches_RingWithMappedLetter_ReturnsOnlyConsistentWords(Type ringType)
     {
         WordList wordList = new();
-        DecoderRing ring = CreateRing(ringType);
+        IDecoderRing ring = CreateRing(ringType);
         ring.Put('X', 'T');
 
         Assert.Equal(["THE"], wordList.GetMatches(new Word("XYZ"), ring));
@@ -182,7 +186,7 @@ public class WordListTests
     public void GetMatches_RingWithUsedLetter_ExcludesWordsUsingItForUnmappedLetters(Type ringType)
     {
         WordList wordList = new();
-        DecoderRing ring = CreateRing(ringType);
+        IDecoderRing ring = CreateRing(ringType);
         ring.Put('Q', 'C'); // 'C' is now taken, so no unmapped letter of XYZ can decode to it
 
         Assert.Equal(["DOG", "THE"], wordList.GetMatches(new Word("XYZ"), ring));
@@ -193,7 +197,7 @@ public class WordListTests
     public void GetMatches_RingWithMultipleMappings_ReturnsWordsSatisfyingAll(Type ringType)
     {
         WordList wordList = new();
-        DecoderRing ring = CreateRing(ringType);
+        IDecoderRing ring = CreateRing(ringType);
         ring.Put('Y', 'O');
         ring.Put('Z', 'K');
 
@@ -209,7 +213,7 @@ public class WordListTests
     public void GetMatches_RingConflictingWithAllCandidates_ReturnsEmpty(Type ringType)
     {
         WordList wordList = new();
-        DecoderRing ring = CreateRing(ringType);
+        IDecoderRing ring = CreateRing(ringType);
         ring.Put('X', 'Q');
 
         Assert.Empty(wordList.GetMatches(new Word("XYZ"), ring));

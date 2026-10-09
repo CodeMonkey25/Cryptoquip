@@ -16,7 +16,7 @@ class Program
 
         Puzzle puzzle = Puzzle.Parse(text);
         
-        DecoderRing ring = DecoderRing.Build();
+        IDecoderRing ring = IDecoderRing.Create();
         ring.Put(puzzle.Hints);
         
         Solver solver = new();

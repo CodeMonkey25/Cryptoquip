@@ -2,14 +2,15 @@
 
 namespace Cryptoquip.Services;
 
-public abstract class DecoderRing
+public interface IDecoderRing
 {
-    public static DecoderRing Build() => new DecoderRingBitmask();
+    public static IDecoderRing Create() => DecoderRingBitmask.Create();
     
-    public abstract int SolveCount { get; }
-    public abstract char Get(char letter);
-    public abstract IEnumerable<(char letter, char match)> GetMatches();
-    public abstract bool Put(char letter, char match);
+    public int SolveCount { get; }
+
+    public char Get(char letter);
+    public IEnumerable<(char letter, char match)> GetMatches();
+    public bool Put(char letter, char match);
 
     public int Put(ReadOnlySpan<char> letters, ReadOnlySpan<char> matches, Span<char> addedLetters = default)
     {
@@ -33,7 +34,7 @@ public abstract class DecoderRing
         }
     }
     
-    public virtual bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
+    public bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
     {
         for (int i = 0; i < encrypted.Length; i++)
         {
@@ -63,12 +64,12 @@ public abstract class DecoderRing
     {
         if (message.IsEmpty) return string.Empty;
 
-        return string.Create(
+        return string.Create<(IDecoderRing ring, ReadOnlyMemory<char> message)>(
             message.Length,
             (ring: this, message),
             static (span, state) =>
             {
-                DecoderRing ring = state.ring;
+                IDecoderRing ring = state.ring;
                 ReadOnlySpan<char> message = state.message.Span;
                 for (int i = 0; i < message.Length; i++)
                 {
@@ -77,7 +78,7 @@ public abstract class DecoderRing
             });
     }
 
-    public abstract void Remove(char letter);
+    public void Remove(char letter);
 
     public void Remove(Span<char> letters)
     {
@@ -87,14 +88,14 @@ public abstract class DecoderRing
         }
     }
     
-    public abstract bool Contains(char letter);
-    public abstract bool UsedContains(char letter);
+    public bool Contains(char letter);
+    public bool UsedContains(char letter);
 
-    public abstract void Clear();
+    public void Clear();
 
-    public abstract IEnumerable<char> GetUsedLetters();
+    public IEnumerable<char> GetUsedLetters();
     
-    public virtual IEnumerable<char> GetUnusedLetters()
+    public IEnumerable<char> GetUnusedLetters()
     {
         uint used = GetUsedLetters().Aggregate<char, uint>(0, (mask, c) => mask | 1u << (c - 'A'));
 
@@ -107,9 +108,9 @@ public abstract class DecoderRing
         }
     }
 
-    public abstract DecoderRing Clone();
+    public IDecoderRing Clone();
     
-    public virtual void Overwrite(DecoderRing other)
+    public void Overwrite(IDecoderRing other)
     {
         Clear();
         foreach (var (letter, match) in other.GetMatches())

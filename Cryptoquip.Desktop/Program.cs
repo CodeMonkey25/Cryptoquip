@@ -29,7 +29,7 @@ sealed class Program
 
     private static void RegisterDependencies()
     {
-        Locator.CurrentMutable.RegisterConstant(DecoderRing.Build());
+        Locator.CurrentMutable.RegisterConstant(IDecoderRing.Create());
         Locator.CurrentMutable.RegisterConstant(new WordList());
     }
 }

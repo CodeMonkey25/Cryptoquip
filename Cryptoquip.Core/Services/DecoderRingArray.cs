@@ -2,16 +2,20 @@
 
 namespace Cryptoquip.Services;
 
-public sealed class DecoderRingArray : DecoderRing
+public sealed class DecoderRingArray : IDecoderRing
 {
+    public static IDecoderRing Create() => new DecoderRingArray();
+
+    private DecoderRingArray() { }
+    
     private char[] _cypher = Enumerable.Range(0, 26).Select(static _ => '-').ToArray();
     private bool[] _usedLetters = new bool[26];
     private int _solveCount;
 
-    public override int SolveCount => _solveCount;
+    public int SolveCount => _solveCount;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Put(char letter, char match)
+    public bool Put(char letter, char match)
     {
         uint l = (uint)(letter - 'A');
         uint m = (uint)(match - 'A');
@@ -26,13 +30,13 @@ public sealed class DecoderRingArray : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override char Get(char letter)
+    public char Get(char letter)
     {
         uint i = (uint)(letter - 'A');
         return i < 26u ? _cypher[i] : letter;
     }
 
-    public override IEnumerable<(char letter, char match)> GetMatches()
+    public IEnumerable<(char letter, char match)> GetMatches()
     {
         for (int i = 0; i < 26; i++)
             if (_cypher[i] != '-')
@@ -40,7 +44,7 @@ public sealed class DecoderRingArray : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override void Remove(char letter)
+    public void Remove(char letter)
     {
         uint i = (uint)(letter - 'A');
         if (i < 26u)
@@ -60,13 +64,13 @@ public sealed class DecoderRingArray : DecoderRing
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool Contains(char letter)
+    public bool Contains(char letter)
     {
         uint i = (uint)(letter - 'A');
         return i < 26u && _cypher[i] != '-';
     }
 
-    public override IEnumerable<char> GetUsedLetters()
+    public IEnumerable<char> GetUsedLetters()
     {
         for (int i = 0; i < _usedLetters.Length; i++)
         {
@@ -75,7 +79,7 @@ public sealed class DecoderRingArray : DecoderRing
         }
     }
     
-    public override IEnumerable<char> GetUnusedLetters()
+    public IEnumerable<char> GetUnusedLetters()
     {
         for (int i = 0; i < _usedLetters.Length; i++)
         {
@@ -85,20 +89,20 @@ public sealed class DecoderRingArray : DecoderRing
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public override bool UsedContains(char letter)
+    public bool UsedContains(char letter)
     {
         uint i = (uint)(letter - 'A');
         return i < 26u && _usedLetters[i];
     }
 
-    public override void Clear()
+    public void Clear()
     {
         Array.Fill(_cypher, '-');
         Array.Clear(_usedLetters);
         _solveCount = 0;
     }
 
-    public override DecoderRing Clone()
+    public IDecoderRing Clone()
     {
         return new DecoderRingArray()
         {
@@ -108,7 +112,7 @@ public sealed class DecoderRingArray : DecoderRing
         };
     }
 
-    public override void Overwrite(DecoderRing other)
+    public void Overwrite(IDecoderRing other)
     {
         if (other is DecoderRingArray otherArray)
         {
@@ -118,12 +122,15 @@ public sealed class DecoderRingArray : DecoderRing
         }
         else
         {
-            base.Overwrite(other);
+            Clear();
+            foreach (var (letter, match) in other.GetMatches())
+            {
+                Put(letter, match);
+            }
         }
     }
     
-    // overriding this for performance, it should mirror the base class's logic
-    public override bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
+    public bool Matches(ReadOnlySpan<char> encrypted, ReadOnlySpan<char> candidate)
     {
         for (int i = 0; i < encrypted.Length; i++)
         {

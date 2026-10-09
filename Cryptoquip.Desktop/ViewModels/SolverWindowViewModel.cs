@@ -14,7 +14,7 @@ public class SolverWindowViewModel : ViewModelBase
 {
     private Puzzle? Puzzle { get; }
     private bool EnableExclusionAnalysis { get; }
-    private DecoderRing Ring { get; } = new DecoderRingNull();
+    private IDecoderRing Ring { get; } = DecoderRingNull.Create();
     private WordList? WordList { get; }
     
     private string _logText = string.Empty;
@@ -30,7 +30,7 @@ public class SolverWindowViewModel : ViewModelBase
     {
         Puzzle = puzzle;
         EnableExclusionAnalysis = enableExclusionAnalysis;
-        Ring = Locator.Current.GetRequiredService<DecoderRing>().Clone();
+        Ring = Locator.Current.GetRequiredService<IDecoderRing>().Clone();
         WordList = Locator.Current.GetRequiredService<WordList>();
         Task.Run(RunSolver);
     }
