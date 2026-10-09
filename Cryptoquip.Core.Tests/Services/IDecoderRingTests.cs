@@ -3,7 +3,7 @@ using Cryptoquip.Services;
 
 namespace Cryptoquip.Tests.Services;
 
-public class DecoderRingTests
+public class IDecoderRingTests
 {
     private const string Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
