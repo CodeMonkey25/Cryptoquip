@@ -64,21 +64,21 @@ public static class ReadOnlyMemoryExtensions
         }
     }
 
-    public static bool Any<T>(this ReadOnlyMemory<T> source, Predicate<T> predicate)
+    public static bool Any<T>(this ReadOnlyMemory<T> source, Func<T, bool> func)
     {
         foreach (T t in source.Span)
         {
-            if (predicate(t))
+            if (func(t))
                 return true;
         }
         return false;
     }
 
-    public static bool All<T>(this ReadOnlyMemory<T> source, Predicate<T> predicate)
+    public static bool All<T>(this ReadOnlyMemory<T> source, Func<T, bool> func)
     {
         foreach (T t in source.Span)
         {
-            if (!predicate(t))
+            if (!func(t))
                 return false;
         }
         return true;
