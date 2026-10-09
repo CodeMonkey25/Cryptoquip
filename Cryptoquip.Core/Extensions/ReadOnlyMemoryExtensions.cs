@@ -64,21 +64,21 @@ public static class ReadOnlyMemoryExtensions
         }
     }
 
-    public static bool Any(this ReadOnlyMemory<char> source, Predicate<char> predicate)
+    public static bool Any<T>(this ReadOnlyMemory<T> source, Predicate<T> predicate)
     {
-        foreach (char c in source.Span)
+        foreach (T t in source.Span)
         {
-            if (predicate(c))
+            if (predicate(t))
                 return true;
         }
         return false;
     }
 
-    public static bool All(this ReadOnlyMemory<char> source, Predicate<char> predicate)
+    public static bool All<T>(this ReadOnlyMemory<T> source, Predicate<T> predicate)
     {
-        foreach (char c in source.Span)
+        foreach (T t in source.Span)
         {
-            if (!predicate(c))
+            if (!predicate(t))
                 return false;
         }
         return true;
@@ -113,6 +113,19 @@ public static class ReadOnlyMemoryExtensions
         for (int i = 0; i < minLength; i++)
         {
             yield return resultSelector(first.Span[i], second.Span[i]);
+        }
+    }
+    
+    public static bool Contains<T>(this ReadOnlyMemory<T> source, T value) => source.Span.Contains(value);
+    
+    public static IEnumerable<T> Where<T>(this ReadOnlyMemory<T> source, Func<T, bool> predicate)
+    {
+        for (int i = 0; i < source.Length; i++)
+        {
+            if (predicate(source.Span[i]))
+            {
+                yield return source.Span[i];
+            }
         }
     }
 }
