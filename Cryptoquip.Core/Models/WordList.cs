@@ -1,4 +1,6 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Frozen;
+using System.Collections.Immutable;
+using System.Runtime.InteropServices;
 using Cryptoquip.Services;
 
 namespace Cryptoquip.Models;
@@ -7,8 +9,7 @@ public class WordList
 {
     private const string DictionaryFileName = @"dictionary.txt";
     internal const int MaxWordLength = 50;
-    private readonly Dictionary<string,List<string>> _words = new();
-    public IReadOnlyDictionary<string,List<string>> Words => _words;
+    public FrozenDictionary<string,ImmutableArray<string>> Words { get; }
 
     public WordList(HashSet<string>? patterns = null)
     {
@@ -21,9 +22,10 @@ public class WordList
             foreach (string pattern in patterns) lengths[pattern.Length] = true;
         }
         
+        Dictionary<string,List<string>> words = new();
         Parallel.ForEach(
             File.ReadLines(Path.Combine(AppContext.BaseDirectory, WordList.DictionaryFileName)),
-            () => new ThreadState(patterns, lengths, maxPatternLength, _words),
+            () => new ThreadState(patterns, lengths, maxPatternLength, words),
             static (word, _, threadState) =>
             {
                 if (word.Length < 1) return threadState;
@@ -59,12 +61,14 @@ public class WordList
             }
         );
         
-        _words.TrimExcess();
-        foreach (List<string> value in _words.Values)
+        // words.TrimExcess();
+        foreach (List<string> value in words.Values)
         {
-            value.TrimExcess();
+        //     value.TrimExcess();
             value.Sort(StringComparer.Ordinal);
         }
+        
+        Words = words.ToFrozenDictionary(kvp => kvp.Key, kvp => kvp.Value.ToImmutableArray());
         
         // int[] lengths = patterns.Select(pattern => pattern.Length).Distinct().ToArray();
         // Parallel.ForEach(File.ReadLines(DictionaryFileName), word =>
@@ -112,10 +116,10 @@ public class WordList
 
     public List<string> GetMatches(Word word, IDecoderRing ring)
     {
-        if (!_words.TryGetValue(word.Pattern, out List<string>? candidates))
+        if (!Words.TryGetValue(word.Pattern, out ImmutableArray<string> candidates))
             return [];
 
-        List<string> matches = new(candidates.Count);
+        List<string> matches = new(candidates.Length);
         foreach (string w in candidates)
         {
             if (ring.Matches(word.Text, w)) matches.Add(w);

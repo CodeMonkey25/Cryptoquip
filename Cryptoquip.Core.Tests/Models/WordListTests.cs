@@ -1,3 +1,5 @@
+using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Reflection;
 using Cryptoquip.Models;
 using Cryptoquip.Services;
@@ -15,7 +17,7 @@ public class WordListTests
     private const string OverMaxLengthWord = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXY";
 
     // every word in dictionary.txt within MaxWordLength, grouped by pattern and sorted ordinally
-    private static readonly Dictionary<string, List<string>> AllWords = new()
+    private static readonly FrozenDictionary<string, ImmutableArray<string>> AllWords = new Dictionary<string, ImmutableArray<string>>()
     {
         ["A"] = ["A", "I"],
         ["AB"] = ["AN", "AT", "TO"],
@@ -25,7 +27,7 @@ public class WordListTests
         ["ABBC"] = ["BOOK", "LOOK", "TOOK"],
         ["ABC'D"] = ["CAN'T", "DON'T"],
         [MaxLengthWord] = [MaxLengthWord],
-    };
+    }.ToFrozenDictionary();
 
     public static TheoryData<Type> RingTypes =>
     [
@@ -44,7 +46,11 @@ public class WordListTests
     {
         WordList wordList = new();
 
-        Assert.Equal(AllWords, wordList.Words);
+        Assert.Equal(AllWords.Keys.Order(StringComparer.Ordinal), wordList.Words.Keys.Order(StringComparer.Ordinal));
+        foreach ((string pattern, ImmutableArray<string> expectedWords) in AllWords)
+        {
+            Assert.Equal<string>(expectedWords, wordList.Words[pattern]);
+        }
     }
 
     [Fact]
@@ -52,7 +58,7 @@ public class WordListTests
     {
         WordList wordList = new();
 
-        foreach ((string pattern, List<string> words) in wordList.Words)
+        foreach ((string pattern, ImmutableArray<string> words) in wordList.Words)
         {
             Assert.All(words, word => Assert.Equal(pattern, Word.MakePattern(word)));
         }
@@ -63,7 +69,7 @@ public class WordListTests
     {
         WordList wordList = new();
 
-        Assert.All(wordList.Words.Values, words => Assert.Equal(words.Order(StringComparer.Ordinal), words));
+        Assert.All(wordList.Words.Values, words => Assert.Equal<string>(words.Order(StringComparer.Ordinal), words));
     }
 
     [Fact]
@@ -79,7 +85,7 @@ public class WordListTests
     {
         WordList wordList = new();
 
-        Assert.Equal([MaxLengthWord], wordList.Words[Word.MakePattern(MaxLengthWord)]);
+        Assert.Equal<string>([MaxLengthWord], wordList.Words[Word.MakePattern(MaxLengthWord)]);
     }
 
     [Fact]
@@ -104,8 +110,8 @@ public class WordListTests
         WordList wordList = new(["ABB", "AB"]);
 
         Assert.Equal(["AB", "ABB"], wordList.Words.Keys.Order(StringComparer.Ordinal));
-        Assert.Equal(AllWords["AB"], wordList.Words["AB"]);
-        Assert.Equal(AllWords["ABB"], wordList.Words["ABB"]);
+        Assert.Equal<string>(AllWords["AB"], wordList.Words["AB"]);
+        Assert.Equal<string>(AllWords["ABB"], wordList.Words["ABB"]);
     }
 
     [Fact]
@@ -113,8 +119,8 @@ public class WordListTests
     {
         WordList wordList = new(["ABC'D"]);
 
-        Assert.Equal(["ABC'D"], wordList.Words.Keys);
-        Assert.Equal(["CAN'T", "DON'T"], wordList.Words["ABC'D"]);
+        Assert.Equivalent((string[])["ABC'D"], wordList.Words.Keys);
+        Assert.Equal<string>(["CAN'T", "DON'T"], wordList.Words["ABC'D"]);
     }
 
     [Fact]
@@ -122,7 +128,7 @@ public class WordListTests
     {
         WordList wordList = new(["ABC", "AAA", "ABCDE"]);
 
-        Assert.Equal(["ABC"], wordList.Words.Keys);
+        Assert.Equivalent((string[])["ABC"], wordList.Words.Keys);
     }
 
     [Fact]
@@ -131,7 +137,7 @@ public class WordListTests
         string pattern = Word.MakePattern(OverMaxLengthWord);
         WordList wordList = new([pattern]);
 
-        Assert.Equal([OverMaxLengthWord], wordList.Words[pattern]);
+        Assert.Equal<string>([OverMaxLengthWord], wordList.Words[pattern]);
     }
 
     [Theory]
@@ -143,7 +149,7 @@ public class WordListTests
     {
         WordList wordList = new();
 
-        Assert.Equal(wordList.Words[pattern], wordList.GetMatches(new Word(encrypted), DecoderRingNull.Create()));
+        Assert.Equal<string>(wordList.Words[pattern], wordList.GetMatches(new Word(encrypted), DecoderRingNull.Create()));
     }
 
     [Theory]
@@ -166,8 +172,7 @@ public class WordListTests
         List<string> matches = wordList.GetMatches(new Word("XYZ"), DecoderRingNull.Create());
         matches.Clear();
 
-        Assert.NotSame(wordList.Words["ABC"], matches);
-        Assert.Equal(AllWords["ABC"], wordList.Words["ABC"]);
+        Assert.Equal<string>(AllWords["ABC"], wordList.Words["ABC"]);
     }
 
     [Theory]
